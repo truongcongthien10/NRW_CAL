@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán & Đánh giá NRW - HueWACO (Phiên bản 10.0 Complete)</title>
+    <title>Chương trình Tính toán & Đánh giá NRW - HueWACO (Phiên bản 11.0 Complete)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -34,32 +34,41 @@
         <div class="max-w-7xl mx-auto px-4 py-3.5 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
                 <h1 class="text-lg font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN & ĐÁNH GIÁ HIỆU QUẢ NRW - HUEWACO</h1>
-                <p class="text-blue-200 text-xs mt-0.5">So sánh Cân bằng Nước Trước/Sau NRW & Tự động lưu trữ dữ liệu</p>
+                <p class="text-blue-200 text-xs mt-0.5">Cập nhật dữ liệu đo thực tế 24h TRƯỚC & SAU NRW có cơ sở khoa học</p>
             </div>
             <div class="flex items-center space-x-2">
                 <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center transition shadow-sm">
                     <i class="fa-solid fa-print mr-1.5"></i> In Báo Cáo
                 </button>
-                <span class="text-xs bg-blue-800 border border-blue-700 px-2.5 py-1 rounded text-blue-200">Phiên bản 10.0 Final</span>
+                <span class="text-xs bg-blue-800 border border-blue-700 px-2.5 py-1 rounded text-blue-200">Phiên bản 11.0 Standard</span>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
-        <!-- BƯỚC 1 -->
+        <!-- BƯỚC 1: DỮ LIỆU ĐO 24H TRƯỚC VÀ SAU NRW -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
-            <div class="bg-blue-800 text-white px-5 py-2.5 flex justify-between items-center">
-                <h2 class="text-sm font-bold uppercase"><i class="fa-solid fa-chart-pie text-yellow-400 mr-2"></i> BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ</h2>
-                <span class="text-xs font-bold text-yellow-300 bg-blue-900 px-2.5 py-1 rounded border border-blue-700" id="current_active_pattern_badge">Pattern: Đang chọn 1</span>
+            <div class="bg-blue-900 text-white px-5 py-2.5 flex flex-wrap justify-between items-center gap-2">
+                <h2 class="text-sm font-bold uppercase"><i class="fa-solid fa-chart-pie text-yellow-400 mr-2"></i> BƯỚC 1: DỮ LIỆU ĐO 24H TRƯỚC VÀ SAU KHI THỰC HIỆN NRW</h2>
+                
+                <!-- Thanh chọn kịch bản xem Pattern hiện tại -->
+                <div class="flex items-center space-x-2 no-print">
+                    <span class="text-xs font-bold text-blue-200">Đang hiển thị dữ liệu:</span>
+                    <select id="view_pattern_mode" onchange="switchViewPatternMode(this.value)" class="p-1.5 border rounded text-xs font-bold text-blue-950 bg-yellow-300 border-yellow-400 shadow-sm cursor-pointer">
+                        <option value="before">1. Pattern TRƯỚC NRW (Hiện trạng đo đạc)</option>
+                        <option value="after">2. Pattern SAU NRW (Đo đạc kiểm tra lại)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Bảng 24h -->
                 <div class="lg:col-span-7 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-table text-blue-600 mr-1.5"></i>Bảng dữ liệu nhu cầu 24h</h3>
+                        <h3 class="font-bold text-slate-700 text-xs uppercase" id="pattern_table_title"><i class="fa-solid fa-table text-blue-600 mr-1.5"></i>Bảng chuỗi số liệu 24h TRƯỚC NRW</h3>
                         <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded shadow-sm flex items-center transition no-print">
-                            <i class="fa-solid fa-pen-to-square mr-1.5"></i> Quản lý Pattern & Chỉnh sửa
+                            <i class="fa-solid fa-pen-to-square mr-1.5"></i> Quản lý & Nhập dữ liệu 2 Pattern
                         </button>
                     </div>
 
@@ -68,8 +77,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 25%;">Thời gian</th>
-                                    <th style="width: 25%;">Lưu lượng (m3/h)</th>
-                                    <th style="width: 25%;">Áp lực (m)</th>
+                                    <th style="width: 25%;">Lưu lượng Q (m3/h)</th>
+                                    <th style="width: 25%;">Áp lực P (m)</th>
                                     <th style="width: 25%;" class="bg-red-50 text-red-900">Q rò rỉ thô (m3/h)</th>
                                 </tr>
                             </thead>
@@ -78,41 +87,38 @@
                     </div>
 
                     <div class="pt-1 flex items-center justify-between bg-slate-50 p-2 border border-slate-300 rounded text-xs">
-                        <label class="font-bold text-slate-700">Tổng lưu lượng cấp vào vùng Q<sub>tổng</sub> [m³/ngđ] (Cộng dồn 24h):</label>
+                        <label class="font-bold text-slate-700">Tổng lưu lượng cấp vào vùng Q<sub>tổng</sub> [m³/ngđ]:</label>
                         <input type="text" id="q_tong" value="918,20" readonly class="w-32 p-1 border border-slate-300 rounded font-extrabold text-blue-900 bg-slate-100 text-center">
                     </div>
                 </div>
 
+                <!-- So sánh Chỉ số Thủy lực TRƯỚC vs SAU thực đo -->
                 <div class="lg:col-span-5 space-y-3">
-                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-1.5"></i>Kết quả Thất thoát Sơ bộ</h3>
-                    <div class="grid grid-cols-1 gap-2.5">
-                        <div class="bg-red-50/70 p-3 rounded border border-red-200 text-center">
-                            <p class="text-xs text-red-700 font-semibold uppercase">TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH P)</p>
-                            <p class="text-3xl font-extrabold text-red-700 mt-0.5" id="res_raw_percent">-- %</p>
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-1.5"></i>Chỉ số Thủy lực thực đo TRƯỚC vs SAU</h3>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-red-50 p-2.5 rounded border border-red-200 text-center">
+                            <p class="text-[0.68rem] text-red-700 font-bold uppercase">THẤT THOÁT TRƯỚC NRW</p>
+                            <p class="text-xl font-extrabold text-red-700 mt-0.5" id="res_b1_pct_before">-- %</p>
+                            <span class="sub-text text-red-600" id="res_b1_q_before">-- m³/ngđ</span>
                         </div>
-                        <div class="bg-red-50/70 p-3 rounded border border-red-200 text-center">
-                            <p class="text-xs text-red-700 font-semibold uppercase">TỔNG Q THẤT THOÁT THÔ CẢ NGÀY</p>
-                            <p class="text-2xl font-extrabold text-red-700 mt-0.5" id="res_raw_q_day">-- m³/ngđ</p>
+                        <div class="bg-emerald-50 p-2.5 rounded border border-emerald-200 text-center">
+                            <p class="text-[0.68rem] text-emerald-800 font-bold uppercase">THẤT THOÁT SAU NRW</p>
+                            <p class="text-xl font-extrabold text-emerald-800 mt-0.5" id="res_b1_pct_after">-- %</p>
+                            <span class="sub-text text-emerald-700" id="res_b1_q_after">-- m³/ngđ</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-50 p-3 rounded border border-slate-300 text-xs space-y-1.5">
-                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Q<sub>MNF</sub> thấp nhất đêm (0h-4h):</span><span class="font-extrabold text-blue-800" id="res_q_mnf">-- m³/h</span></div>
-                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Khung giờ xảy ra Q<sub>MNF</sub>:</span><span class="font-bold text-slate-800" id="res_mnf_time">--</span></div>
-                        <div class="flex justify-between items-center border-t border-slate-200 pt-1.5"><span class="text-slate-600 font-medium">Áp lực đêm tương ứng (P<sub>đêm</sub>):</span><span class="font-bold text-slate-800" id="res_p_dem">-- m</span></div>
-                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Áp lực trung bình 24h (P<sub>TB 24h</sub>):</span><span class="font-bold text-slate-800" id="res_p_tb">-- m</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Q<sub>MNF TRƯỚC</sub> đêm (0h-4h):</span><span class="font-bold text-red-700" id="res_q_mnf_before">-- m³/h</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Q<sub>MNF SAU</sub> đo thực tế:</span><span class="font-bold text-emerald-700" id="res_q_mnf_after">-- m³/h</span></div>
+                        <div class="flex justify-between items-center border-t border-slate-200 pt-1.5"><span class="text-slate-600 font-medium">Áp lực đêm P<sub>đêm TRƯỚC</sub>:</span><span class="font-bold text-slate-800" id="res_p_dem_before">-- m</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Áp lực đêm P<sub>đêm SAU</sub>:</span><span class="font-bold text-slate-800" id="res_p_dem_after">-- m</span></div>
+                        <div class="flex justify-between items-center border-t border-slate-200 pt-1.5"><span class="text-slate-600 font-medium">Áp lực trung bình 24h P<sub>TB TRƯỚC</sub>:</span><span class="font-bold text-slate-800" id="res_p_tb_before">-- m</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-600 font-medium">Áp lực trung bình 24h P<sub>TB SAU</sub>:</span><span class="font-bold text-slate-800" id="res_p_tb_after">-- m</span></div>
                     </div>
                 </div>
             </div>
-
-            <details class="bg-slate-50 border-t border-slate-200 p-3 text-xs text-slate-700 no-print">
-                <summary class="font-bold cursor-pointer text-blue-800"><i class="fa-solid fa-circle-info mr-1"></i> Giải thích công thức tính Q rò rỉ thô Bước 1</summary>
-                <div class="mt-2 space-y-1 pl-4 border-l-2 border-blue-400 font-mono text-[0.75rem]">
-                    <p><b>Công thức từng giờ:</b> Q_thô_i = Q_MNF × (P_i / P_đêm)^N  [m³/h]</p>
-                    <p><b>Cộng dồn 24h:</b> Q_thô_24h = Σ (Q_thô_i từ 00h đến 23h)  [m³/ngđ]</p>
-                    <p><i>Trong đó: N là hệ số mũ áp lực (mặc định N = 1.5 cho ống nhựa HDPE).</i></p>
-                </div>
-            </details>
         </section>
 
 
@@ -146,28 +152,21 @@
                 </div>
 
                 <div class="lg:col-span-6 space-y-3">
-                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-chart-line text-emerald-600 mr-1.5"></i>Kết quả Bóc tách Thất thoát Nền</h3>
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-chart-line text-emerald-600 mr-1.5"></i>Kết quả Rò rỉ Nền Cho Phép (UBL)</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-blue-50/70 p-3 rounded border border-blue-200 text-center">
-                            <p class="text-[0.7rem] text-blue-700 font-semibold uppercase">Q NỀN CHO PHẾP CẢ NGÀY</p>
-                            <p class="text-2xl font-extrabold text-blue-800 mt-0.5" id="res_q_n_day">-- m³/ngđ</p>
-                            <span class="sub-text text-blue-600">Q<sub>n giờ</sub>: <span id="res_q_n_hour">--</span> m³/h</span>
+                            <p class="text-[0.7rem] text-blue-700 font-semibold uppercase">Q NỀN TRƯỚC NRW</p>
+                            <p class="text-2xl font-extrabold text-blue-800 mt-0.5" id="res_q_n_day_before">-- m³/ngđ</p>
+                            <span class="sub-text text-blue-600">Q<sub>n giờ</sub>: <span id="res_q_n_hour_before">--</span> m³/h</span>
                         </div>
                         <div class="bg-emerald-50/70 p-3 rounded border border-emerald-200 text-center">
-                            <p class="text-[0.7rem] text-emerald-700 font-semibold uppercase">Q NỀN ĐƠN VỊ CẢ VÙNG</p>
-                            <p class="text-2xl font-extrabold text-emerald-800 mt-0.5" id="res_q_n_unit">--</p>
-                            <span class="sub-text text-emerald-700">lít / hộ / giờ</span>
+                            <p class="text-[0.7rem] text-emerald-700 font-semibold uppercase">Q NỀN SAU NRW</p>
+                            <p class="text-2xl font-extrabold text-emerald-800 mt-0.5" id="res_q_n_day_after">-- m³/ngđ</p>
+                            <span class="sub-text text-emerald-700">Q<sub>n giờ</sub>: <span id="res_q_n_hour_after">--</span> m³/h</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <details class="bg-slate-50 border-t border-slate-200 p-3 text-xs text-slate-700 no-print">
-                <summary class="font-bold cursor-pointer text-emerald-800"><i class="fa-solid fa-circle-info mr-1"></i> Công thức bóc tách Rò rỉ nền theo IWA</summary>
-                <div class="mt-2 pl-4 border-l-2 border-emerald-500 font-mono text-[0.75rem]">
-                    <p>Q_n_giờ = [(0.02×Lm + 1.25×Nc + 0.033×Lp) × (P_đêm / 50)^N] / 1000  [m³/h]</p>
-                </div>
-            </details>
         </section>
 
 
@@ -192,13 +191,12 @@
                             </button>
                         </div>
 
-                        <div class="max-h-[200px] overflow-y-auto border border-slate-300 bg-white">
+                        <div class="max-h-[180px] overflow-y-auto border border-slate-300 bg-white">
                             <table class="excel-table">
                                 <thead>
                                     <tr>
                                         <th>Tên điểm</th>
                                         <th>Địa chỉ</th>
-                                        <th>Nguyên nhân</th>
                                         <th class="text-center">L/phút</th>
                                         <th class="text-center">m³/h</th>
                                         <th class="text-center no-print">Thao tác</th>
@@ -209,21 +207,23 @@
                         </div>
 
                         <div class="bg-red-50 p-2 rounded border border-red-200 text-xs flex justify-between items-center font-bold text-red-900">
-                            <span>TỔNG LƯỢNG RÒ RỈ CÁC ĐIỂM:</span>
-                            <span id="res_total_leak_points">0,00 m³/h (0,00 L/phút)</span>
+                            <span>TỔNG LƯỢNG RÒ RỈ CÁC ĐIỂM DÒ TÌM ĐƯỢC:</span>
+                            <span id="res_total_leak_points">0,00 m³/h</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="lg:col-span-5 space-y-3">
-                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-bullseye text-purple-700 mr-1.5"></i>Kết quả Cân bằng Rò rỉ Vỡ ống</h3>
-                    <div class="bg-purple-50/70 p-3 rounded border border-purple-200 text-center space-y-0.5">
-                        <p class="text-[0.7rem] text-purple-800 font-semibold uppercase">Q RÒ RỈ VỠ ỐNG ĐÊM THỰC SỰ</p>
-                        <p class="text-2xl font-extrabold text-purple-900" id="res_q_burst_night">-- m³/h</p>
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-bullseye text-purple-700 mr-1.5"></i>Đối Soát Rò Rỉ Vỡ Ống TRƯỚC vs SAU</h3>
+                    <div class="bg-purple-50 p-3 rounded border border-purple-200 text-center">
+                        <p class="text-[0.7rem] text-purple-800 font-semibold uppercase">RÒ RỈ VỠ ỐNG TRƯỚC NRW</p>
+                        <p class="text-2xl font-extrabold text-purple-900" id="res_q_burst_day_before">-- m³/ngđ</p>
+                        <span class="sub-text text-purple-700">Đêm: <span id="res_q_burst_night_before">--</span> m³/h</span>
                     </div>
-                    <div class="bg-red-50/80 p-3 rounded border border-red-300 text-center space-y-0.5 shadow-sm">
-                        <p class="text-xs text-red-700 font-bold uppercase">TỔNG LƯỢNG RÒ RỈ VỠ ỐNG THỰC SỰ CẢ NGÀY</p>
-                        <p class="text-2xl font-extrabold text-red-700" id="res_q_burst_day">-- m³/ngđ</p>
+                    <div class="bg-emerald-50 p-3 rounded border border-emerald-200 text-center">
+                        <p class="text-[0.7rem] text-emerald-800 font-semibold uppercase">RÒ RỈ VỠ ỐNG SAU NRW (TỪ SỐ LIỆU ĐO LẠI)</p>
+                        <p class="text-2xl font-extrabold text-emerald-900" id="res_q_burst_day_after">-- m³/ngđ</p>
+                        <span class="sub-text text-emerald-700">Đêm: <span id="res_q_burst_night_after">--</span> m³/h</span>
                     </div>
                 </div>
             </div>
@@ -237,11 +237,11 @@
                 
                 <div class="flex items-center space-x-2 no-print">
                     <select id="iwa_scenario_select" onchange="switchIWAScenario(this.value)" class="p-1 border rounded text-xs font-bold text-slate-800 bg-white">
-                        <option value="before">Hiển thị Bảng: TRƯỚC NRW (Hiện trạng)</option>
-                        <option value="after">Hiển thị Bảng: SAU NRW (Đã khắc phục)</option>
+                        <option value="before">Hiển thị Bảng: TRƯỚC NRW (Tọa độ đo 1)</option>
+                        <option value="after" selected>Hiển thị Bảng: SAU NRW (Tọa độ đo 2 - Thực tế)</option>
                     </select>
                     <button onclick="openOtherParamsModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1 rounded shadow-sm flex items-center transition">
-                        <i class="fa-solid fa-sliders mr-1.5"></i> + Nhập Các Chỉ Số Khác
+                        <i class="fa-solid fa-sliders mr-1.5"></i> + Nhập Chỉ Số Khác
                     </button>
                 </div>
             </div>
@@ -293,13 +293,9 @@
                     </table>
                 </div>
 
-                <!-- Bảng Hướng dẫn Nguồn số liệu -->
-                <div class="bg-slate-50 border border-slate-300 p-3 rounded text-xs text-slate-700 space-y-1">
-                    <p class="font-bold text-slate-800"><i class="fa-solid fa-book-open text-blue-700 mr-1"></i> Hướng dẫn nguồn số liệu Cân bằng Nước TRƯỚC vs SAU NRW:</p>
-                    <ul class="list-disc list-inside space-y-1 text-slate-600 pl-1">
-                        <li><b>Bảng TRƯỚC NRW (Hiện trạng):</b> Lấy tổng thất thoát thô từ dữ liệu Pattern đo đạc ban đầu. Lượng rò rỉ vỡ ống $Q_{\text{bursts 24h}}$ được bóc tách bằng $Q_{\text{thô 24h}} - Q_{\text{nền 24h}}$.</li>
-                        <li><b>Bảng SAU NRW (Đã khắc phục):</b> Giả định đã phát hiện & sửa chữa triệt để các điểm vỡ ống. Lượng rò rỉ vỡ ống $Q_{\text{bursts 24h}}$ giảm về $0\text{ m}^3/\text{ngđ}$. Thất thoát thực sự chỉ còn lại Rò rỉ nền $UBL$ và rò rỉ sau đồng hồ.</li>
-                    </ul>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-slate-700 space-y-1">
+                    <p class="font-bold text-blue-900"><i class="fa-solid fa-square-check text-blue-700 mr-1"></i> Cơ sở dữ liệu Cân bằng Nước mới:</p>
+                    <p class="text-slate-600">Bảng Cân bằng Nước SAU NRW được tính toán hoàn toàn dựa trên **Kết quả chuỗi đo đạc 24h thực tế đo lại sau khi thực hiện NRW** (bao gồm Tổng cấp $Q_{\text{cấp SAU}}$, $Q_{\text{MNF SAU}}$ và Áp lực $P_{\text{SAU}}$ thực tế). Điều này đảm bảo đánh giá chính xác lượng rò rỉ vỡ ống còn lại thực sự sau công tác chống thất thoát.</p>
                 </div>
             </div>
         </section>
@@ -348,14 +344,14 @@
 
                 <!-- Bảng Đối Soát Chỉ Tiêu Thủy Lực -->
                 <div class="space-y-2">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-code-compare text-teal-700 mr-1.5"></i>Bảng So Sánh Chi Tiết Chỉ Tiêu Thủy Lực TRƯỚC vs SAU NRW</h3>
+                    <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-code-compare text-teal-700 mr-1.5"></i>Bảng So Sánh Chi Tiết Chỉ Tiêu Thủy Lực Thực Đo TRƯỚC vs SAU NRW</h3>
                     <div class="overflow-x-auto border border-slate-300">
                         <table class="excel-table text-center">
                             <thead>
                                 <tr class="bg-slate-100">
                                     <th class="text-left">Hạng mục chỉ tiêu thủy lực</th>
-                                    <th>Trước NRW (Hiện trạng)</th>
-                                    <th>Sau NRW (Đã khắc phục)</th>
+                                    <th>Trước NRW (Thực đo 1)</th>
+                                    <th>Sau NRW (Thực đo 2)</th>
                                     <th>Hiệu quả cải thiện</th>
                                 </tr>
                             </thead>
@@ -376,24 +372,24 @@
                                     <td class="text-left font-bold">3. Áp lực nước trung bình 24h P_TB (m)</td>
                                     <td id="tb_ptb_before">-- m</td>
                                     <td id="tb_ptb_after">-- m</td>
-                                    <td class="text-blue-800 font-bold" id="tb_ptb_diff">+ -- m (Hồi phục)</td>
+                                    <td class="text-blue-800 font-bold" id="tb_ptb_diff">-- m</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Biểu đồ So Sánh 24h Nằm Trực Tiếp Ở Bước 5 -->
+                <!-- Biểu đồ So Sánh 24h Thực Đo -->
                 <div class="space-y-2 pt-2 border-t no-print">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-chart-line text-teal-700 mr-1.5"></i>Biểu Đồ So Sánh Đường Cong Thủy Lực 24 Giờ</h3>
+                    <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-chart-line text-teal-700 mr-1.5"></i>Biểu Đồ So Sánh Đường Cong Thủy Lực Thực Đo TRƯỚC vs SAU NRW</h3>
                     <div class="h-80 w-full bg-slate-50 p-2 rounded border border-slate-300">
                         <canvas id="patternChart"></canvas>
                     </div>
                     <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-bold pt-1">
-                        <span class="flex items-center text-blue-700"><span class="w-4 h-1 bg-blue-700 inline-block mr-1"></span> Q Trước NRW (m³/h)</span>
-                        <span class="flex items-center text-amber-600"><span class="w-4 h-0.5 bg-amber-600 border-b border-dashed border-amber-600 inline-block mr-1"></span> P Trước NRW (m)</span>
-                        <span class="flex items-center text-teal-600"><span class="w-4 h-1 bg-teal-600 inline-block mr-1"></span> Q Sau NRW (Đã sửa rò rỉ)</span>
-                        <span class="flex items-center text-emerald-600"><span class="w-4 h-0.5 bg-emerald-600 border-b border-dashed border-emerald-600 inline-block mr-1"></span> P Sau NRW (Áp lực hồi phục)</span>
+                        <span class="flex items-center text-blue-700"><span class="w-4 h-1 bg-blue-700 inline-block mr-1"></span> Q Thực đo TRƯỚC NRW (m³/h)</span>
+                        <span class="flex items-center text-amber-600"><span class="w-4 h-0.5 bg-amber-600 border-b border-dashed border-amber-600 inline-block mr-1"></span> P Thực đo TRƯỚC NRW (m)</span>
+                        <span class="flex items-center text-teal-600"><span class="w-4 h-1 bg-teal-600 inline-block mr-1"></span> Q Thực đo SAU NRW (m³/h)</span>
+                        <span class="flex items-center text-emerald-600"><span class="w-4 h-0.5 bg-emerald-600 border-b border-dashed border-emerald-600 inline-block mr-1"></span> P Thực đo SAU NRW (m)</span>
                     </div>
                 </div>
 
@@ -403,22 +399,22 @@
     </main>
 
 
-    <!-- MODAL 1: QUẢN LÝ PATTERN -->
+    <!-- MODAL 1: QUẢN LÝ 2 PATTERN (TRƯỚC & SAU NRW) -->
     <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
         <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl overflow-hidden border border-slate-300 flex flex-col max-h-[90vh]">
             <div class="bg-blue-900 text-white px-5 py-3 flex justify-between items-center">
-                <h3 class="text-sm font-bold flex items-center"><i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ PATTERN & CHỈNH SỬA DỮ LIỆU</h3>
+                <h3 class="text-sm font-bold flex items-center"><i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ VÀ CẬP NHẬT DỮ LIỆU ĐO 2 PATTERN TRƯỚC & SAU NRW</h3>
                 <button onclick="closePatternModal()" class="text-slate-300 hover:text-white text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <div class="p-5 space-y-4 overflow-y-auto">
                 <div class="flex items-center justify-between bg-slate-50 p-3 rounded border border-slate-300">
                     <div class="flex items-center space-x-2">
-                        <label class="text-xs font-bold text-slate-700">Chọn Pattern:</label>
-                        <select id="modal_pattern_select" onchange="switchModalPattern(this.value)" class="p-1.5 border rounded text-xs font-bold text-blue-900 bg-white"></select>
-                        <button onclick="createNewPatternPrompt()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-2.5 py-1.5 rounded flex items-center">
-                            <i class="fa-solid fa-plus mr-1"></i> + Tạo Pattern Mới
-                        </button>
+                        <label class="text-xs font-bold text-slate-700">Chọn Pattern để chỉnh sửa:</label>
+                        <select id="modal_pattern_select" onchange="switchModalPattern(this.value)" class="p-1.5 border rounded text-xs font-bold text-blue-900 bg-white">
+                            <option value="before">Pattern TRƯỚC NRW (Hiện trạng)</option>
+                            <option value="after">Pattern SAU NRW (Đo kiểm tra lại)</option>
+                        </select>
                     </div>
 
                     <label class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer flex items-center">
@@ -429,11 +425,11 @@
 
                 <div class="grid grid-cols-2 gap-4 bg-blue-50/50 p-3 rounded border border-blue-200">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700">Tên Pattern hiện tại:</label>
+                        <label class="block text-xs font-bold text-slate-700">Tên Pattern:</label>
                         <input type="text" id="modal_pat_name" class="mt-1 w-full p-1.5 border rounded text-xs font-bold text-blue-900">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700">Tổng lưu lượng cấp Q<sub>tổng</sub> [m³/ngđ] (Cố định - Tự cộng dồn):</label>
+                        <label class="block text-xs font-bold text-slate-700">Tổng lưu lượng cấp Q<sub>tổng</sub> [m³/ngđ] (Cố định - Tự cộng 24h):</label>
                         <input type="text" id="modal_pat_qtong" readonly class="mt-1 w-full p-1.5 border border-slate-300 rounded text-xs font-bold text-blue-900 text-center bg-slate-100">
                     </div>
                 </div>
@@ -454,7 +450,7 @@
 
             <div class="bg-slate-100 px-5 py-3 border-t flex justify-end space-x-2">
                 <button onclick="closePatternModal()" class="px-4 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded">Đóng</button>
-                <button onclick="savePatternFromModal()" class="px-5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu Pattern & Cập Nhật Màn Hình</button>
+                <button onclick="savePatternFromModal()" class="px-5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded shadow"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu Pattern & Cập Nhật Hệ Thống</button>
             </div>
         </div>
     </div>
@@ -523,7 +519,7 @@
     </div>
 
 
-    <!-- JAVASCRIPT LOGIC V10 COMPLETE -->
+    <!-- JAVASCRIPT LOGIC V11 COMPLETE -->
     <script>
         function parseVietnameseNumber(val) {
             if (val === null || val === undefined) return 0;
@@ -540,9 +536,10 @@
             return num.toFixed(decimals).replace('.', ',');
         }
 
-        let patternsStore = JSON.parse(localStorage.getItem('huewaco_nrw_patterns_v10')) || {
-            1: {
-                name: "Pattern 1 (Mặc định)",
+        // Mặc định lưu trữ 2 Pattern đo đạc thực tế: TRƯỚC và SAU NRW
+        let patternsStore = JSON.parse(localStorage.getItem('huewaco_nrw_patterns_v11')) || {
+            before: {
+                name: "Pattern TRƯỚC NRW (Hiện trạng)",
                 q_tong: 918.2,
                 data: [
                     { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
@@ -570,46 +567,198 @@
                     { time: "22h - 23h", q: 22.0, p: 23.2, isNight: false },
                     { time: "23h - 24h", q: 15.0, p: 23.4, isNight: false }
                 ]
+            },
+            after: {
+                name: "Pattern SAU NRW (Đo thực tế lại)",
+                q_tong: 730.0,
+                data: [
+                    { time: "00h - 01h", q: 3.5, p: 25.5, isNight: true },
+                    { time: "01h - 02h", q: 2.8, p: 25.2, isNight: true },
+                    { time: "02h - 03h", q: 2.9, p: 25.0, isNight: true },
+                    { time: "03h - 04h", q: 3.2, p: 24.8, isNight: true },
+                    { time: "04h - 05h", q: 10.5, p: 24.5, isNight: false },
+                    { time: "05h - 06h", q: 28.0, p: 24.0, isNight: false },
+                    { time: "06h - 07h", q: 46.0, p: 23.5, isNight: false },
+                    { time: "07h - 08h", q: 52.0, p: 23.0, isNight: false },
+                    { time: "08h - 09h", q: 48.0, p: 23.2, isNight: false },
+                    { time: "09h - 10h", q: 41.0, p: 24.0, isNight: false },
+                    { time: "10h - 11h", q: 39.0, p: 24.5, isNight: false },
+                    { time: "11h - 12h", q: 43.0, p: 24.2, isNight: false },
+                    { time: "12h - 13h", q: 36.0, p: 24.8, isNight: false },
+                    { time: "13h - 14h", q: 33.0, p: 25.0, isNight: false },
+                    { time: "14h - 15h", q: 37.0, p: 24.6, isNight: false },
+                    { time: "15h - 16h", q: 41.0, p: 24.0, isNight: false },
+                    { time: "16h - 17h", q: 48.0, p: 23.5, isNight: false },
+                    { time: "17h - 18h", q: 54.0, p: 23.0, isNight: false },
+                    { time: "18h - 19h", q: 49.0, p: 23.2, isNight: false },
+                    { time: "19h - 20h", q: 41.0, p: 24.0, isNight: false },
+                    { time: "20h - 21h", q: 30.0, p: 24.8, isNight: false },
+                    { time: "21h - 22h", q: 21.0, p: 25.0, isNight: false },
+                    { time: "22h - 23h", q: 13.0, p: 25.2, isNight: false },
+                    { time: "23h - 24h", q: 7.1, p: 25.4, isNight: false }
+                ]
             }
         };
 
-        let activePattern = parseInt(localStorage.getItem('huewaco_nrw_active_pat_v10')) || 1;
-        if (!patternsStore[activePattern]) activePattern = Object.keys(patternsStore)[0];
-
-        let leakPointsStore = JSON.parse(localStorage.getItem('huewaco_nrw_leaks_v10')) || [
+        let viewPatternMode = 'before';
+        let leakPointsStore = JSON.parse(localStorage.getItem('huewaco_nrw_leaks_v11')) || [
             { name: "Điểm xì đai D110", address: "45 Lý Thường Kiệt", reason: "Bụt đai khởi thủy", lpm: 20.0 }
         ];
 
-        let otherParams = JSON.parse(localStorage.getItem('huewaco_nrw_other_params_v10')) || { exported: 0.0, unbilled: 0.0, postmeter: 0.0 };
-        let waterPrice = parseVietnameseNumber(localStorage.getItem('huewaco_nrw_water_price_v10')) || 7000;
-        let iwaScenario = 'before';
+        let otherParams = JSON.parse(localStorage.getItem('huewaco_nrw_other_params_v11')) || { exported: 0.0, unbilled: 0.0, postmeter: 0.0 };
+        let waterPrice = parseVietnameseNumber(localStorage.getItem('huewaco_nrw_water_price_v11')) || 7000;
+        let iwaScenario = 'after';
 
         let myChart = null;
-        let editingModalPattern = activePattern;
+        let editingModalPatternKey = 'before';
         let globalCalcResults = {};
 
-        function render24hTableReadonly() {
+        function switchViewPatternMode(key) {
+            viewPatternMode = key;
+            calculateAndSaveAll();
+        }
+
+        function render24hTableReadonly(calcPatternResult) {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
-            const pat = patternsStore[activePattern];
+            const pat = patternsStore[viewPatternMode];
 
-            document.getElementById('current_active_pattern_badge').innerText = `Pattern: ${pat.name}`;
+            document.getElementById('pattern_table_title').innerText = `Bảng chuỗi số liệu 24h ${viewPatternMode === 'before' ? 'TRƯỚC NRW' : 'SAU NRW (Đo thực tế)'}`;
             document.getElementById('q_tong').value = formatVietnameseNumber(pat.q_tong, 2);
 
             pat.data.forEach((item, index) => {
                 const bgHighlight = item.isNight ? 'bg-yellow-50/80 font-semibold' : 'bg-white';
                 const tagNight = item.isNight ? ' <span class="text-[0.65rem] bg-yellow-200 text-yellow-800 px-1 rounded font-bold">Đêm</span>' : '';
+                const qThoHour = calcPatternResult.qThoList[index] || 0;
 
                 const row = `
                     <tr class="${bgHighlight}">
                         <td class="text-center font-medium">${item.time}${tagNight}</td>
                         <td class="p-0 border"><input type="text" value="${formatVietnameseNumber(item.q, 2)}" readonly class="excel-input text-blue-900 font-bold p-1"></td>
                         <td class="p-0 border"><input type="text" value="${formatVietnameseNumber(item.p, 2)}" readonly class="excel-input text-slate-800 p-1"></td>
-                        <td class="text-center font-extrabold text-red-700 bg-red-50/40" id="q_tho_${index}">--</td>
+                        <td class="text-center font-extrabold text-red-700 bg-red-50/40">${formatVietnameseNumber(qThoHour, 2)}</td>
                     </tr>
                 `;
                 tbody.insertAdjacentHTML('beforeend', row);
             });
+        }
+
+        function processSinglePattern(patKey, N_EXPONENT, lM, lP, nC, qCustNight, qLeakPointsM3h) {
+            const pat = patternsStore[patKey];
+            let sumP = 0;
+            let sumQ = 0;
+            let minQNight = Infinity;
+            let minTimeNight = "";
+            let pDemAtMinQ = 0;
+
+            const timeLabels = [];
+            const qList = [];
+            const pList = [];
+
+            pat.data.forEach((item, i) => {
+                sumP += item.p;
+                sumQ += item.q;
+                qList.push(item.q);
+                pList.push(item.p);
+                timeLabels.push(item.time.split(' ')[0]);
+
+                if (i >= 0 && i <= 3) {
+                    if (item.q < minQNight && item.q > 0) {
+                        minQNight = item.q;
+                        minTimeNight = item.time;
+                        pDemAtMinQ = item.p;
+                    }
+                }
+            });
+
+            pat.q_tong = sumQ;
+            const pTB24h = sumP / 24.0;
+            const qTongDay = sumQ;
+
+            let totalQNRWRawDay = 0;
+            const qThoList = [];
+
+            pat.data.forEach((item) => {
+                let qThoHour = pDemAtMinQ > 0 ? minQNight * Math.pow(item.p / pDemAtMinQ, N_EXPONENT) : 0;
+                qThoList.push(qThoHour);
+                totalQNRWRawDay += qThoHour;
+            });
+
+            const rawPercent = qTongDay > 0 ? (totalQNRWRawDay / qTongDay) * 100.0 : 0;
+
+            // B2: Nền
+            const ublLiterHour = (0.02 * lM + 1.25 * nC + 0.033 * lP) * Math.pow(pDemAtMinQ / 50.0, N_EXPONENT);
+            const qNHour = ublLiterHour / 1000.0;
+            const qNDay = 24.0 * qNHour * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
+
+            // B3: Vỡ ống thực sự
+            let qBurstNight = minQNight - qNHour - qCustNight - qLeakPointsM3h;
+            if (qBurstNight < 0) qBurstNight = 0;
+            const qBurstDay = 24.0 * qBurstNight * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
+
+            return {
+                qTongDay, minQNight, minTimeNight, pDemAtMinQ, pTB24h,
+                qThoList, totalQNRWRawDay, rawPercent,
+                qNHour, qNDay, qBurstNight, qBurstDay,
+                timeLabels, qList, pList
+            };
+        }
+
+        function calculateAndSaveAll() {
+            waterPrice = parseVietnameseNumber(document.getElementById('inp_water_price').value);
+
+            localStorage.setItem('huewaco_nrw_patterns_v11', JSON.stringify(patternsStore));
+            localStorage.setItem('huewaco_nrw_leaks_v11', JSON.stringify(leakPointsStore));
+            localStorage.setItem('huewaco_nrw_other_params_v11', JSON.stringify(otherParams));
+            localStorage.setItem('huewaco_nrw_water_price_v11', waterPrice);
+
+            const N_EXPONENT = parseVietnameseNumber(document.getElementById('n_exponent').value) || 1.5;
+            const lM = parseVietnameseNumber(document.getElementById('l_m').value);
+            const lP = parseVietnameseNumber(document.getElementById('l_p').value);
+            const nC = parseVietnameseNumber(document.getElementById('n_c').value);
+
+            const leakRes = renderLeakPointsTable();
+            const qLeakPointsM3h = leakRes.totalM3h;
+            const qCustNight = parseVietnameseNumber(document.getElementById('q_customer_night').value);
+
+            // Tính toán đồng thời cả 2 Pattern TRƯỚC và SAU thực đo
+            const resBefore = processSinglePattern('before', N_EXPONENT, lM, lP, nC, qCustNight, qLeakPointsM3h);
+            const resAfter = processSinglePattern('after', N_EXPONENT, lM, lP, nC, qCustNight, 0); // Sau NRW các điểm rò rỉ cũ đã sửa
+
+            globalCalcResults = { before: resBefore, after: resAfter };
+
+            // Render giao diện B1 theo mode được chọn
+            render24hTableReadonly(globalCalcResults[viewPatternMode]);
+
+            // Hiển thị chỉ số B1
+            document.getElementById('res_b1_pct_before').innerText = formatVietnameseNumber(resBefore.rawPercent, 2) + " %";
+            document.getElementById('res_b1_q_before').innerText = formatVietnameseNumber(resBefore.totalQNRWRawDay, 2) + " m³/ngđ";
+            document.getElementById('res_b1_pct_after').innerText = formatVietnameseNumber(resAfter.rawPercent, 2) + " %";
+            document.getElementById('res_b1_q_after').innerText = formatVietnameseNumber(resAfter.totalQNRWRawDay, 2) + " m³/ngđ";
+
+            document.getElementById('res_q_mnf_before').innerText = formatVietnameseNumber(resBefore.minQNight, 2) + " m³/h";
+            document.getElementById('res_q_mnf_after').innerText = formatVietnameseNumber(resAfter.minQNight, 2) + " m³/h";
+            document.getElementById('res_p_dem_before').innerText = formatVietnameseNumber(resBefore.pDemAtMinQ, 2) + " m";
+            document.getElementById('res_p_dem_after').innerText = formatVietnameseNumber(resAfter.pDemAtMinQ, 2) + " m";
+            document.getElementById('res_p_tb_before').innerText = formatVietnameseNumber(resBefore.pTB24h, 2) + " m";
+            document.getElementById('res_p_tb_after').innerText = formatVietnameseNumber(resAfter.pTB24h, 2) + " m";
+
+            // Hiển thị chỉ số B2 Nền
+            document.getElementById('res_q_n_hour_before').innerText = formatVietnameseNumber(resBefore.qNHour, 2);
+            document.getElementById('res_q_n_day_before').innerText = formatVietnameseNumber(resBefore.qNDay, 2) + " m³/ngđ";
+            document.getElementById('res_q_n_hour_after').innerText = formatVietnameseNumber(resAfter.qNHour, 2);
+            document.getElementById('res_q_n_day_after').innerText = formatVietnameseNumber(resAfter.qNDay, 2) + " m³/ngđ";
+
+            // Hiển thị chỉ số B3 Vỡ ống
+            document.getElementById('res_q_burst_night_before').innerText = formatVietnameseNumber(resBefore.qBurstNight, 2);
+            document.getElementById('res_q_burst_day_before').innerText = formatVietnameseNumber(resBefore.qBurstDay, 2) + " m³/ngđ";
+            document.getElementById('res_q_burst_night_after').innerText = formatVietnameseNumber(resAfter.qBurstNight, 2);
+            document.getElementById('res_q_burst_day_after').innerText = formatVietnameseNumber(resAfter.qBurstDay, 2) + " m³/ngđ";
+
+            // Render B4 Bảng IWA & B5
+            renderIWATable();
+            renderStep5Summary();
+            renderChart(resBefore.timeLabels, resBefore.qList, resBefore.pList, resAfter.qList, resAfter.pList);
         }
 
         function renderLeakPointsTable() {
@@ -627,7 +776,6 @@
                     <tr class="bg-white">
                         <td class="font-bold text-slate-800">${item.name}</td>
                         <td class="text-slate-600">${item.address || '-'}</td>
-                        <td class="text-slate-600">${item.reason || '-'}</td>
                         <td class="text-center font-bold text-red-700 bg-red-50/30">${formatVietnameseNumber(item.lpm, 2)}</td>
                         <td class="text-center font-extrabold text-blue-800 bg-blue-50/30">${formatVietnameseNumber(m3h, 2)}</td>
                         <td class="text-center space-x-1 no-print">
@@ -643,134 +791,21 @@
             return { totalLpm, totalM3h };
         }
 
-        function calculateAndSaveAll() {
-            waterPrice = parseVietnameseNumber(document.getElementById('inp_water_price').value);
-
-            localStorage.setItem('huewaco_nrw_patterns_v10', JSON.stringify(patternsStore));
-            localStorage.setItem('huewaco_nrw_active_pat_v10', activePattern);
-            localStorage.setItem('huewaco_nrw_leaks_v10', JSON.stringify(leakPointsStore));
-            localStorage.setItem('huewaco_nrw_other_params_v10', JSON.stringify(otherParams));
-            localStorage.setItem('huewaco_nrw_water_price_v10', waterPrice);
-
-            render24hTableReadonly();
-
-            let sumP = 0;
-            let minQNight = Infinity;
-            let minTimeNight = "";
-            let pDemAtMinQ = 0;
-
-            const pat = patternsStore[activePattern];
-            const qBefore = [];
-            const pBefore = [];
-            const qAfter = [];
-            const pAfter = [];
-            const timeLabels = [];
-
-            pat.data.forEach((item, i) => {
-                sumP += item.p;
-                qBefore.push(item.q);
-                pBefore.push(item.p);
-                timeLabels.push(item.time.split(' ')[0]);
-
-                if (i >= 0 && i <= 3) {
-                    if (item.q < minQNight && item.q > 0) {
-                        minQNight = item.q;
-                        minTimeNight = item.time;
-                        pDemAtMinQ = item.p;
-                    }
-                }
-            });
-
-            const pTB24h = sumP / 24.0;
-            const qTongDay = pat.q_tong || 1.0;
-            const N_EXPONENT = parseVietnameseNumber(document.getElementById('n_exponent').value) || 1.5;
-
-            let totalQNRWRawDay = 0;
-
-            pat.data.forEach((item, i) => {
-                let qThoHour = pDemAtMinQ > 0 ? minQNight * Math.pow(item.p / pDemAtMinQ, N_EXPONENT) : 0;
-                totalQNRWRawDay += qThoHour;
-                const elem = document.getElementById(`q_tho_${i}`);
-                if (elem) elem.innerText = formatVietnameseNumber(qThoHour, 2);
-            });
-
-            const rawPercent = (totalQNRWRawDay / qTongDay) * 100.0;
-
-            // Kết quả B1
-            document.getElementById('res_raw_percent').innerText = formatVietnameseNumber(rawPercent, 2) + " %";
-            document.getElementById('res_raw_q_day').innerText = formatVietnameseNumber(totalQNRWRawDay, 2) + " m³/ngđ";
-            document.getElementById('res_q_mnf').innerText = formatVietnameseNumber(minQNight, 2) + " m³/h";
-            document.getElementById('res_mnf_time').innerText = minTimeNight;
-            document.getElementById('res_p_dem').innerText = formatVietnameseNumber(pDemAtMinQ, 2) + " m";
-            document.getElementById('res_p_tb').innerText = formatVietnameseNumber(pTB24h, 2) + " m";
-
-            // Kết quả B2
-            const lM = parseVietnameseNumber(document.getElementById('l_m').value); 
-            const lP = parseVietnameseNumber(document.getElementById('l_p').value); 
-            const nC = parseVietnameseNumber(document.getElementById('n_c').value); 
-
-            if (pDemAtMinQ <= 0) return;
-
-            const ublLiterHour = (0.02 * lM + 1.25 * nC + 0.033 * lP) * Math.pow(pDemAtMinQ / 50.0, N_EXPONENT);
-            const qNHour = ublLiterHour / 1000.0; 
-            const qNDay = 24.0 * qNHour * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
-            const qNUnit = nC > 0 ? ublLiterHour / nC : 0;
-
-            document.getElementById('res_q_n_hour').innerText = formatVietnameseNumber(qNHour, 2);
-            document.getElementById('res_q_n_day').innerText = formatVietnameseNumber(qNDay, 2) + " m³/ngđ";
-            document.getElementById('res_q_n_unit').innerText = formatVietnameseNumber(qNUnit, 2);
-
-            // Kết quả B3
-            const leakRes = renderLeakPointsTable();
-            const qLeakPointsM3h = leakRes.totalM3h;
-            const qCustNight = parseVietnameseNumber(document.getElementById('q_customer_night').value);
-
-            let qBurstNight = minQNight - qNHour - qCustNight - qLeakPointsM3h;
-            if (qBurstNight < 0) qBurstNight = 0;
-            const qBurstDay = 24.0 * qBurstNight * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
-
-            document.getElementById('res_q_burst_night').innerText = formatVietnameseNumber(qBurstNight, 2) + " m³/h";
-            document.getElementById('res_q_burst_day').innerText = formatVietnameseNumber(qBurstDay, 2) + " m³/ngđ";
-
-            // Tính toán Sau NRW
-            for (let i = 0; i < 24; i++) {
-                const qB = qBefore[i];
-                const pB = pBefore[i];
-                const qReduced = qB - (qBurstNight * Math.pow(pB / pDemAtMinQ, N_EXPONENT));
-                qAfter.push(qReduced > 0 ? qReduced : qB * 0.85);
-                pAfter.push(pB * 1.05);
-            }
-
-            const totalQNRWAfterDay = qNDay + otherParams.postmeter;
-            const rawPercentAfter = (totalQNRWAfterDay / qTongDay) * 100.0;
-
-            globalCalcResults = {
-                qTongDay, totalQNRWRawDay, rawPercent, qNDay, qBurstDay,
-                totalQNRWAfterDay, rawPercentAfter, pTB24h,
-                timeLabels, qBefore, pBefore, qAfter, pAfter
-            };
-
-            renderIWATable();
-            renderStep5Summary();
-            renderChart(timeLabels, qBefore, pBefore, qAfter, pAfter);
-        }
-
         function switchIWAScenario(val) {
             iwaScenario = val;
             renderIWATable();
         }
 
         function renderIWATable() {
-            const res = globalCalcResults;
-            if (!res.qTongDay) return;
+            const res = globalCalcResults[iwaScenario];
+            if (!res || !res.qTongDay) return;
 
-            const isBefore = (iwaScenario === 'before');
-            const nrwVal = isBefore ? res.totalQNRWRawDay : res.totalQNRWAfterDay;
+            const nrwVal = res.totalQNRWRawDay;
             const siv = res.qTongDay;
 
             const authVal = siv - nrwVal;
             const billedVal = authVal - otherParams.exported - otherParams.unbilled;
-            const burstsVal = isBefore ? (res.totalQNRWRawDay - res.qNDay - otherParams.postmeter) : 0;
+            const burstsVal = res.qBurstDay;
 
             document.getElementById('iwa_siv').innerText = formatVietnameseNumber(siv, 2) + " m³/ngđ";
             document.getElementById('iwa_auth_cons').innerText = formatVietnameseNumber(authVal > 0 ? authVal : 0, 2) + " m³/ngđ";
@@ -802,32 +837,33 @@
         }
 
         function renderStep5Summary() {
-            const res = globalCalcResults;
-            if (!res.qTongDay) return;
+            const resB = globalCalcResults.before;
+            const resA = globalCalcResults.after;
+            if (!resB || !resA) return;
 
-            const savedDay = res.totalQNRWRawDay - res.totalQNRWAfterDay;
+            const savedDay = resB.totalQNRWRawDay - resA.totalQNRWRawDay;
             const savedYear = savedDay * 365.0;
-            const pctDiff = res.rawPercent - res.rawPercentAfter;
+            const pctDiff = resB.rawPercent - resA.rawPercent;
             const moneySavedYear = (savedYear * waterPrice) / 1000000.0;
 
             document.getElementById('eval_saved_m3').innerText = formatVietnameseNumber(savedDay, 2) + " m³/ngđ";
             document.getElementById('eval_saved_year').innerText = formatVietnameseNumber(savedYear, 2);
             document.getElementById('eval_reduced_pct').innerText = formatVietnameseNumber(pctDiff, 2) + " %";
-            document.getElementById('eval_pct_before').innerText = formatVietnameseNumber(res.rawPercent, 2) + "%";
-            document.getElementById('eval_pct_after').innerText = formatVietnameseNumber(res.rawPercentAfter, 2) + "%";
+            document.getElementById('eval_pct_before').innerText = formatVietnameseNumber(resB.rawPercent, 2) + "%";
+            document.getElementById('eval_pct_after').innerText = formatVietnameseNumber(resA.rawPercent, 2) + "%";
             document.getElementById('eval_money_saved').innerText = formatVietnameseNumber(moneySavedYear, 2) + " Triệu đ/năm";
 
-            document.getElementById('tb_pct_before').innerText = formatVietnameseNumber(res.rawPercent, 2) + " %";
-            document.getElementById('tb_pct_after').innerText = formatVietnameseNumber(res.rawPercentAfter, 2) + " %";
+            document.getElementById('tb_pct_before').innerText = formatVietnameseNumber(resB.rawPercent, 2) + " %";
+            document.getElementById('tb_pct_after').innerText = formatVietnameseNumber(resA.rawPercent, 2) + " %";
             document.getElementById('tb_pct_diff').innerText = "- " + formatVietnameseNumber(pctDiff, 2) + " %";
 
-            document.getElementById('tb_burst_before').innerText = formatVietnameseNumber(res.qBurstDay, 2) + " m³/ngđ";
-            document.getElementById('tb_burst_after').innerText = "0,00 m³/ngđ";
-            document.getElementById('tb_burst_diff').innerText = "- " + formatVietnameseNumber(res.qBurstDay, 2) + " m³/ngđ";
+            document.getElementById('tb_burst_before').innerText = formatVietnameseNumber(resB.qBurstDay, 2) + " m³/ngđ";
+            document.getElementById('tb_burst_after').innerText = formatVietnameseNumber(resA.qBurstDay, 2) + " m³/ngđ";
+            document.getElementById('tb_burst_diff').innerText = "- " + formatVietnameseNumber(resB.qBurstDay - resA.qBurstDay, 2) + " m³/ngđ";
 
-            document.getElementById('tb_ptb_before').innerText = formatVietnameseNumber(res.pTB24h, 2) + " m";
-            document.getElementById('tb_ptb_after').innerText = formatVietnameseNumber(res.pTB24h * 1.05, 2) + " m";
-            document.getElementById('tb_ptb_diff').innerText = "+ " + formatVietnameseNumber(res.pTB24h * 0.05, 2) + " m";
+            document.getElementById('tb_ptb_before').innerText = formatVietnameseNumber(resB.pTB24h, 2) + " m";
+            document.getElementById('tb_ptb_after').innerText = formatVietnameseNumber(resA.pTB24h, 2) + " m";
+            document.getElementById('tb_ptb_diff').innerText = (resA.pTB24h >= resB.pTB24h ? "+ " : "- ") + formatVietnameseNumber(Math.abs(resA.pTB24h - resB.pTB24h), 2) + " m";
         }
 
         function renderChart(labels, qBefore, pBefore, qAfter, pAfter) {
@@ -839,10 +875,10 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Q Trước NRW (m³/h)', data: qBefore, borderColor: '#1d4ed8', backgroundColor: 'rgba(29, 78, 216, 0.05)', borderWidth: 2.5, tension: 0.3, yAxisID: 'y' },
-                        { label: 'P Trước NRW (m)', data: pBefore, borderColor: '#d97706', borderDash: [5, 5], borderWidth: 2, tension: 0.3, yAxisID: 'y1' },
-                        { label: 'Q Sau NRW (m³/h)', data: qAfter, borderColor: '#0d9488', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, yAxisID: 'y' },
-                        { label: 'P Sau NRW (m)', data: pAfter, borderColor: '#16a34a', borderDash: [3, 3], borderWidth: 2, tension: 0.3, yAxisID: 'y1' }
+                        { label: 'Q Thực đo TRƯỚC (m³/h)', data: qBefore, borderColor: '#1d4ed8', backgroundColor: 'rgba(29, 78, 216, 0.05)', borderWidth: 2.5, tension: 0.3, yAxisID: 'y' },
+                        { label: 'P Thực đo TRƯỚC (m)', data: pBefore, borderColor: '#d97706', borderDash: [5, 5], borderWidth: 2, tension: 0.3, yAxisID: 'y1' },
+                        { label: 'Q Thực đo SAU (m³/h)', data: qAfter, borderColor: '#0d9488', backgroundColor: 'transparent', borderWidth: 2.5, tension: 0.3, yAxisID: 'y' },
+                        { label: 'P Thực đo SAU (m)', data: pAfter, borderColor: '#16a34a', borderDash: [3, 3], borderWidth: 2, tension: 0.3, yAxisID: 'y1' }
                     ]
                 },
                 options: {
@@ -859,9 +895,9 @@
 
         // Modal Pattern
         function openPatternModal() {
-            editingModalPattern = activePattern;
-            renderModalPatternSelect();
-            loadPatternDataIntoModal(editingModalPattern);
+            editingModalPatternKey = viewPatternMode;
+            document.getElementById('modal_pattern_select').value = editingModalPatternKey;
+            loadPatternDataIntoModal(editingModalPatternKey);
             document.getElementById('patternModal').classList.remove('hidden');
             document.getElementById('patternModal').classList.add('flex');
         }
@@ -871,32 +907,9 @@
             document.getElementById('patternModal').classList.remove('flex');
         }
 
-        function renderModalPatternSelect() {
-            const select = document.getElementById('modal_pattern_select');
-            select.innerHTML = '';
-            Object.keys(patternsStore).forEach(k => {
-                const opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = patternsStore[k].name;
-                if (parseInt(k) === editingModalPattern) opt.selected = true;
-                select.appendChild(opt);
-            });
-        }
-
         function switchModalPattern(patKey) {
-            editingModalPattern = parseInt(patKey);
-            loadPatternDataIntoModal(editingModalPattern);
-        }
-
-        function createNewPatternPrompt() {
-            const newName = prompt("Nhập tên cho Pattern mới:");
-            if (!newName) return;
-            const newKey = Date.now();
-            patternsStore[newKey] = JSON.parse(JSON.stringify(patternsStore[1]));
-            patternsStore[newKey].name = newName;
-            editingModalPattern = newKey;
-            renderModalPatternSelect();
-            loadPatternDataIntoModal(editingModalPattern);
+            editingModalPatternKey = patKey;
+            loadPatternDataIntoModal(editingModalPatternKey);
         }
 
         function recalculateModalQTong() {
@@ -932,8 +945,8 @@
         }
 
         function savePatternFromModal() {
-            const pat = patternsStore[editingModalPattern];
-            pat.name = document.getElementById('modal_pat_name').value.trim() || `Pattern ${editingModalPattern}`;
+            const pat = patternsStore[editingModalPatternKey];
+            pat.name = document.getElementById('modal_pat_name').value.trim() || `Pattern ${editingModalPatternKey}`;
 
             let sumQ = 0;
             pat.data.forEach((item, idx) => {
@@ -941,12 +954,11 @@
                 item.p = parseVietnameseNumber(document.getElementById(`m_p_${idx}`).value);
                 sumQ += item.q;
             });
-            pat.q_tong = sumQ; // Khóa gán bằng tổng 24 giờ
+            pat.q_tong = sumQ;
 
-            activePattern = editingModalPattern;
             closePatternModal();
             calculateAndSaveAll();
-            alert("Đã lưu thành công Pattern vĩnh viễn!");
+            alert("Đã lưu thành công dữ liệu Pattern vào hệ thống!");
         }
 
         function importExcelDataForPattern(event) {
@@ -962,7 +974,7 @@
                     const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
                     let count = 0;
-                    const patData = patternsStore[editingModalPattern].data;
+                    const patData = patternsStore[editingModalPatternKey].data;
 
                     for (let r = 0; r < json.length && count < 24; r++) {
                         const row = json[r];
@@ -985,7 +997,7 @@
                         }
                     }
 
-                    loadPatternDataIntoModal(editingModalPattern);
+                    loadPatternDataIntoModal(editingModalPatternKey);
                     alert(`Đã Import thành công ${count} khung giờ!`);
                 } catch (err) { alert("Lỗi khi đọc file Excel!"); }
             };
