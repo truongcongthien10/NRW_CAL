@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - Đổi tên nhãn & Import Excel</title>
+    <title>Chương trình Tính toán NRW - Chuẩn 00h đến 23h</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -32,9 +32,9 @@
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>CHƯƠNG TRÌNH TÍNH TOÁN NRW</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Mô-đun Bước 1 & Bước 2: Hiệu chỉnh Áp lực 24h & Import Excel Dữ liệu</p>
+                <p class="text-blue-200 text-xs mt-0.5">Dữ liệu chuẩn 00h-23h | Hiệu chỉnh Áp lực 24h & Bóc tách Q nền IWA</p>
             </div>
-            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 3.5</span>
+            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 3.6 Chuẩn</span>
         </div>
     </header>
 
@@ -48,17 +48,17 @@
                 <h2 class="text-base font-bold uppercase flex items-center">
                     <i class="fa-solid fa-chart-pie text-yellow-400 mr-2.5"></i> BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH ÁP LỰC 24H)
                 </h2>
-                <span class="text-xs bg-blue-700 text-blue-100 px-3 py-0.5 rounded-full">Tự động quét đêm 00h-04h & Cộng dồn 24h</span>
+                <span class="text-xs bg-blue-700 text-blue-100 px-3 py-0.5 rounded-full">Quét đêm 00h-04h & Cộng dồn 24h</span>
             </div>
 
             <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H VỚI TÊN NHÃN CỘT MỚI & NÚT IMPORT EXCEL -->
+                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H (00H TỚI 23H) -->
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Q rò rỉ. thô từng giờ</h3>
                         
-                        <!-- CỤM NÚT IMPORT EXCEL VÀ CHỌN PATTERN -->
+                        <!-- CỤM NÚT IMPORT EXCEL VÀ PATTERN -->
                         <div class="flex space-x-2">
                             <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer shadow flex items-center transition">
                                 <i class="fa-solid fa-file-excel mr-1.5"></i> Import Excel
@@ -71,12 +71,11 @@
                         </div>
                     </div>
 
-                    <!-- Bảng 24h xếp dọc với TÊN CỘT CẬP NHẬT THEO YÊU CẦU -->
-                    <div class="max-h-[340px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
+                    <!-- BẢNG DỮ LIỆU TỪ 00H ĐẾN 23H VỚI NHÃN CỘT DỮ LIỆU CHUẨN -->
+                    <div class="max-h-[360px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
                                 <tr>
-                                    <!-- ĐỔI TÊN 4 CỘT THEO ĐÚNG YÊU CẦU -->
                                     <th class="px-2 py-2 border text-center">Thời gian</th>
                                     <th class="px-2 py-2 border text-center">Lưu lượng (m3/h)</th>
                                     <th class="px-2 py-2 border text-center">Áp lực (m)</th>
@@ -84,7 +83,7 @@
                                 </tr>
                             </thead>
                             <tbody id="step1_24h_tbody" class="divide-y">
-                                <!-- Render 24h bằng JS -->
+                                <!-- JS sẽ render 24 dòng chính xác từ 00h-01h đến 23h-24h -->
                             </tbody>
                         </table>
                     </div>
@@ -217,9 +216,7 @@
     </main>
 
 
-    <!-- ========================================================================= -->
-    <!-- MODAL BẢNG PATTERN 24H (QUẢN LÝ NHIỀU PATTERN & CHỌN PATTERN KÍCH HOẠT) -->
-    <!-- ========================================================================= -->
+    <!-- MODAL BẢNG PATTERN 24H -->
     <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
             
@@ -261,7 +258,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH & IMPORT EXCEL -->
     <script>
-        // Store lưu giữ 5 Pattern khác nhau
+        // Khởi tạo Dữ liệu chuẩn từ 00h - 01h đến 23h - 24h
         let patternsStore = {
             1: [
                 { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
@@ -298,7 +295,7 @@
 
         let activePattern = 1;
 
-        // Render bảng 24h với tiêu đề cột mới
+        // Render bảng 24h chuẩn 00h đến 23h
         function render24hTable() {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
@@ -348,13 +345,11 @@
                     const worksheet = workbook.Sheets[firstSheetName];
                     const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                    // Duyệt các dòng trong Excel tìm dữ liệu số
                     let count = 0;
                     for (let r = 0; r < json.length && count < 24; r++) {
                         const row = json[r];
                         if (!row || row.length < 2) continue;
 
-                        // Tìm 2 cột số liên tiếp là Q và P
                         let qVal = null, pVal = null;
                         for (let c = 0; c < row.length; c++) {
                             const val = parseFloat(row[c]);
@@ -396,6 +391,7 @@
                 
                 sumP += pVal;
 
+                // Tự động tìm Q_MNF trong 4 khung giờ đêm (00h-01h đến 03h-04h)
                 if (i >= 0 && i <= 3) {
                     if (qVal < minQNight && qVal > 0) {
                         minQNight = qVal;
