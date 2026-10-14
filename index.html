@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - Hiệu chỉnh Áp lực 24h</title>
+    <title>Chương trình Tính toán NRW - Đổi tên nhãn & Import Excel</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Thư viện đọc file Excel SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         input:focus {
             background-color: #fef08a !important;
@@ -28,10 +31,10 @@
     <header class="bg-blue-900 text-white shadow-lg mb-6">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>TÍNH TOÁN NRW - MÔ HÌNH 2 BƯỚC CẢI TIẾN</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Tự động tính Q thất thoát thô từng giờ theo áp lực P_i & Bóc tách Q nền IWA chuẩn</p>
+                <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>CHƯƠNG TRÌNH TÍNH TOÁN NRW</h1>
+                <p class="text-blue-200 text-xs mt-0.5">Mô-đun Bước 1 & Bước 2: Hiệu chỉnh Áp lực 24h & Import Excel Dữ liệu</p>
             </div>
-            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 3.2</span>
+            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 3.5</span>
         </div>
     </header>
 
@@ -50,22 +53,34 @@
 
             <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H & CỘT TÍNH Q THẤT THOÁT THÔ -->
+                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H VỚI TÊN NHÃN CỘT MỚI & NÚT IMPORT EXCEL -->
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Tính Q Thất thoát thô từng giờ</h3>
-                        <span class="text-xs text-slate-500">Đơn vị: Q (m³/h) | P (mH₂O)</span>
+                        <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Q rò rỉ. thô từng giờ</h3>
+                        
+                        <!-- CỤM NÚT IMPORT EXCEL VÀ CHỌN PATTERN -->
+                        <div class="flex space-x-2">
+                            <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer shadow flex items-center transition">
+                                <i class="fa-solid fa-file-excel mr-1.5"></i> Import Excel
+                                <input type="file" id="excel_file_input" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcelData(event)">
+                            </label>
+
+                            <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center transition">
+                                <i class="fa-solid fa-table-cells mr-1.5"></i> Pattern 24h
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Bảng 24h xếp dọc mượt mà có thêm cột Q_thô từng giờ -->
+                    <!-- Bảng 24h xếp dọc với TÊN CỘT CẬP NHẬT THEO YÊU CẦU -->
                     <div class="max-h-[340px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
                                 <tr>
-                                    <th class="px-2 py-2 border text-center">Khung giờ</th>
-                                    <th class="px-2 py-2 border text-center">Đồng hồ Q (m³/h)</th>
-                                    <th class="px-2 py-2 border text-center">Áp lực P (mH₂O)</th>
-                                    <th class="px-2 py-2 border text-center bg-red-100 text-red-800">Q Thô_i (m³/h)</th>
+                                    <!-- ĐỔI TÊN 4 CỘT THEO ĐÚNG YÊU CẦU -->
+                                    <th class="px-2 py-2 border text-center">Thời gian</th>
+                                    <th class="px-2 py-2 border text-center">Lưu lượng (m3/h)</th>
+                                    <th class="px-2 py-2 border text-center">Áp lực (m)</th>
+                                    <th class="px-2 py-2 border text-center bg-red-100 text-red-800">Q rò rỉ. thô (m3/h)</th>
                                 </tr>
                             </thead>
                             <tbody id="step1_24h_tbody" class="divide-y">
@@ -80,7 +95,7 @@
                     </div>
 
                     <button onclick="calculateNRW()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
-                        <i class="fa-solid fa-calculator mr-2"></i> Tính toán Thất thoát Sơ bộ Bước 1
+                        <i class="fa-solid fa-calculator mr-2"></i> TÍNH TOÁN THẤT THOÁT SƠ BỘ BƯỚC 1
                     </button>
                 </div>
 
@@ -97,7 +112,7 @@
                         <div class="bg-red-50 p-3.5 rounded-xl border border-red-200 text-center">
                             <p class="text-xs text-red-600 font-semibold">TỔNG Q THẤT THOÁT THÔ (CỘNG DỒN 24H)</p>
                             <p class="text-2xl font-extrabold text-red-700 mt-1" id="res_raw_q_day">-- m³/ngđ</p>
-                            <span class="sub-text text-red-600">Tổng 24 giờ Q<sub>thô_i</sub> đã hiệu chỉnh theo P<sub>i</sub></span>
+                            <span class="sub-text text-red-600">Tổng 24 giờ Q rò rỉ. thô đã hiệu chỉnh theo Áp lực (m)</span>
                         </div>
                     </div>
 
@@ -112,11 +127,11 @@
                         </div>
                         <div class="flex justify-between items-center border-t pt-1.5">
                             <span class="text-slate-600 font-medium">Áp lực đêm tương ứng (P<sub>đêm</sub>):</span>
-                            <span class="font-bold text-slate-800" id="res_p_dem">-- mH₂O</span>
+                            <span class="font-bold text-slate-800" id="res_p_dem">-- m</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600 font-medium">Áp lực trung bình 24h (P<sub>TB 24h</sub>):</span>
-                            <span class="font-bold text-slate-800" id="res_p_tb">-- mH₂O</span>
+                            <span class="font-bold text-slate-800" id="res_p_tb">-- m</span>
                         </div>
                     </div>
                 </div>
@@ -163,7 +178,7 @@
                     </div>
 
                     <button onclick="calculateNRW()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
-                        <i class="fa-solid fa-calculator mr-2"></i> Tính toán Thất thoát Nền Bước 2
+                        <i class="fa-solid fa-calculator mr-2"></i> TÍNH TOÁN THẤT THOÁT NỀN BƯỚC 2
                     </button>
                 </div>
 
@@ -191,7 +206,7 @@
                             <span class="text-base text-red-600 font-extrabold" id="res_q_loss_temp">-- m³/ngđ</span>
                         </div>
                         <p class="text-[0.72rem] text-slate-600 font-mono bg-white p-2 rounded border border-yellow-300" id="step2_formula_detail">
-                            Phép tính: Q Thất thoát = Q_NRW_thô (cộng dồn 24h) - Q_n_ngày = 0.0 - 0.0 = 0.0 m³/ngđ
+                            Phép tính: Q Thất thoát = Q rò rỉ. thô (24h) - Q nền (24h) = 0.0 - 0.0 = 0.0 m³/ngđ
                         </p>
                     </div>
                 </div>
@@ -201,41 +216,95 @@
 
     </main>
 
-    <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH -->
-    <script>
-        const default24hData = [
-            { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
-            { time: "01h - 02h", q: 11.0, p: 23.2, isNight: true }, // Q_MNF mẫu
-            { time: "02h - 03h", q: 11.2, p: 23.0, isNight: true },
-            { time: "03h - 04h", q: 12.0, p: 22.8, isNight: true },
-            { time: "04h - 05h", q: 18.5, p: 22.5, isNight: false },
-            { time: "05h - 06h", q: 35.0, p: 22.0, isNight: false },
-            { time: "06h - 07h", q: 55.0, p: 21.5, isNight: false },
-            { time: "07h - 08h", q: 62.0, p: 21.0, isNight: false },
-            { time: "08h - 09h", q: 58.0, p: 21.2, isNight: false },
-            { time: "09h - 10h", q: 50.0, p: 22.0, isNight: false },
-            { time: "10h - 11h", q: 48.0, p: 22.5, isNight: false },
-            { time: "11h - 12h", q: 52.0, p: 22.2, isNight: false },
-            { time: "12h - 13h", q: 45.0, p: 22.8, isNight: false },
-            { time: "13h - 14h", q: 42.0, p: 23.0, isNight: false },
-            { time: "14h - 15h", q: 46.0, p: 22.6, isNight: false },
-            { time: "15h - 16h", q: 50.0, p: 22.0, isNight: false },
-            { time: "16h - 17h", q: 58.0, p: 21.5, isNight: false },
-            { time: "17h - 18h", q: 65.0, p: 21.0, isNight: false },
-            { time: "18h - 19h", q: 60.0, p: 21.2, isNight: false },
-            { time: "19h - 20h", q: 52.0, p: 22.0, isNight: false },
-            { time: "20h - 21h", q: 40.0, p: 22.8, isNight: false },
-            { time: "21h - 22h", q: 30.0, p: 23.0, isNight: false },
-            { time: "22h - 23h", q: 22.0, p: 23.2, isNight: false },
-            { time: "23h - 24h", q: 15.0, p: 23.4, isNight: false }
-        ];
 
-        // Render bảng 24h
+    <!-- ========================================================================= -->
+    <!-- MODAL BẢNG PATTERN 24H (QUẢN LÝ NHIỀU PATTERN & CHỌN PATTERN KÍCH HOẠT) -->
+    <!-- ========================================================================= -->
+    <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-base font-bold flex items-center">
+                        <i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ CÁC PATTERN MẪU 24 GIỜ
+                    </h3>
+                    <p class="text-xs text-blue-200 mt-0.5">Tạo các mẫu dữ liệu khác nhau và chọn Pattern kích hoạt cho mô hình</p>
+                </div>
+                <button onclick="closePatternModal()" class="text-slate-300 hover:text-white text-xl font-bold p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Chọn Pattern kích hoạt tính toán:</label>
+                    <div class="grid grid-cols-5 gap-2" id="pattern_selector_container">
+                        <!-- JS Render 5 Radio/Button Pattern -->
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-500 italic"><i class="fa-solid fa-circle-info mr-1"></i>Mỗi Pattern lưu giữ bộ dữ liệu Lưu lượng và Áp lực theo 24 giờ khác nhau.</p>
+            </div>
+
+            <div class="bg-slate-100 px-6 py-3.5 border-t flex justify-end space-x-3">
+                <button onclick="closePatternModal()" class="px-5 py-2 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded-lg transition">
+                    Đóng
+                </button>
+                <button onclick="applyPatternModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
+                    <i class="fa-solid fa-check mr-2"></i> Áp Dụng Pattern Chọn
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH & IMPORT EXCEL -->
+    <script>
+        // Store lưu giữ 5 Pattern khác nhau
+        let patternsStore = {
+            1: [
+                { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
+                { time: "01h - 02h", q: 11.0, p: 23.2, isNight: true },
+                { time: "02h - 03h", q: 11.2, p: 23.0, isNight: true },
+                { time: "03h - 04h", q: 12.0, p: 22.8, isNight: true },
+                { time: "04h - 05h", q: 18.5, p: 22.5, isNight: false },
+                { time: "05h - 06h", q: 35.0, p: 22.0, isNight: false },
+                { time: "06h - 07h", q: 55.0, p: 21.5, isNight: false },
+                { time: "07h - 08h", q: 62.0, p: 21.0, isNight: false },
+                { time: "08h - 09h", q: 58.0, p: 21.2, isNight: false },
+                { time: "09h - 10h", q: 50.0, p: 22.0, isNight: false },
+                { time: "10h - 11h", q: 48.0, p: 22.5, isNight: false },
+                { time: "11h - 12h", q: 52.0, p: 22.2, isNight: false },
+                { time: "12h - 13h", q: 45.0, p: 22.8, isNight: false },
+                { time: "13h - 14h", q: 42.0, p: 23.0, isNight: false },
+                { time: "14h - 15h", q: 46.0, p: 22.6, isNight: false },
+                { time: "15h - 16h", q: 50.0, p: 22.0, isNight: false },
+                { time: "16h - 17h", q: 58.0, p: 21.5, isNight: false },
+                { time: "17h - 18h", q: 65.0, p: 21.0, isNight: false },
+                { time: "18h - 19h", q: 60.0, p: 21.2, isNight: false },
+                { time: "19h - 20h", q: 52.0, p: 22.0, isNight: false },
+                { time: "20h - 21h", q: 40.0, p: 22.8, isNight: false },
+                { time: "21h - 22h", q: 30.0, p: 23.0, isNight: false },
+                { time: "22h - 23h", q: 22.0, p: 23.2, isNight: false },
+                { time: "23h - 24h", q: 15.0, p: 23.4, isNight: false }
+            ]
+        };
+
+        // Khởi tạo các Pattern 2..5 từ Pattern 1 mẫu
+        for (let p = 2; p <= 5; p++) {
+            patternsStore[p] = JSON.parse(JSON.stringify(patternsStore[1]));
+        }
+
+        let activePattern = 1;
+
+        // Render bảng 24h với tiêu đề cột mới
         function render24hTable() {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
+            const currentData = patternsStore[activePattern];
 
-            default24hData.forEach((item, index) => {
+            currentData.forEach((item, index) => {
                 const bgHighlight = item.isNight ? 'bg-yellow-50/70 font-semibold' : 'bg-white';
                 const tagNight = item.isNight ? ' <span class="text-[0.65rem] bg-yellow-200 text-yellow-800 px-1 rounded font-bold">Đêm</span>' : '';
 
@@ -243,10 +312,10 @@
                     <tr class="${bgHighlight} border-b hover:bg-slate-100">
                         <td class="px-2 py-1 border text-center font-medium">${item.time}${tagNight}</td>
                         <td class="px-1 py-1 border">
-                            <input type="number" step="0.1" id="q_${index}" value="${item.q}" onclick="this.select()" oninput="calculateNRW()" class="w-full text-center p-1 border rounded text-blue-900 font-bold">
+                            <input type="number" step="0.1" id="q_${index}" value="${item.q}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-blue-900 font-bold">
                         </td>
                         <td class="px-1 py-1 border">
-                            <input type="number" step="0.1" id="p_${index}" value="${item.p}" onclick="this.select()" oninput="calculateNRW()" class="w-full text-center p-1 border rounded text-slate-800">
+                            <input type="number" step="0.1" id="p_${index}" value="${item.p}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-slate-800">
                         </td>
                         <td class="px-2 py-1 border text-center font-extrabold text-red-700 bg-red-50/50" id="q_tho_${index}">
                             --
@@ -257,14 +326,70 @@
             });
         }
 
-        // HÀM TÍNH TOÁN CHÍNH
+        function updateInputValue(index) {
+            const qVal = parseFloat(document.getElementById(`q_${index}`).value) || 0;
+            const pVal = parseFloat(document.getElementById(`p_${index}`).value) || 0;
+            patternsStore[activePattern][index].q = qVal;
+            patternsStore[activePattern][index].p = pVal;
+            calculateNRW();
+        }
+
+        // CHỨC NĂNG IMPORT DỮ LIỆU TỪ EXCEL / CSV
+        function importExcelData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    // Duyệt các dòng trong Excel tìm dữ liệu số
+                    let count = 0;
+                    for (let r = 0; r < json.length && count < 24; r++) {
+                        const row = json[r];
+                        if (!row || row.length < 2) continue;
+
+                        // Tìm 2 cột số liên tiếp là Q và P
+                        let qVal = null, pVal = null;
+                        for (let c = 0; c < row.length; c++) {
+                            const val = parseFloat(row[c]);
+                            if (!isNaN(val)) {
+                                if (qVal === null) qVal = val;
+                                else if (pVal === null) { pVal = val; break; }
+                            }
+                        }
+
+                        if (qVal !== null) {
+                            patternsStore[activePattern][count].q = qVal;
+                            patternsStore[activePattern][count].p = pVal !== null ? pVal : 20.0;
+                            count++;
+                        }
+                    }
+
+                    render24hTable();
+                    calculateNRW();
+                    alert(`Đã Import thành công ${count} khung giờ từ file Excel!`);
+                } catch (err) {
+                    alert("Lỗi khi đọc file Excel. Vui lòng kiểm tra lại định dạng tập tin!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // HÀM TÍNH TOÁN CHÍNH DỰA TRÊN ĐỒNG BỘ ÁP LỰC
         function calculateNRW() {
             let sumP = 0;
             let minQNight = Infinity;
             let minTimeNight = "";
             let pDemAtMinQ = 0;
 
-            // 1. TÌM Q_MNF BAN ĐÊM TỪ 0H ĐẾN 4H SÁNG (i từ 0 đến 3)
+            const currentData = patternsStore[activePattern];
+
             for (let i = 0; i < 24; i++) {
                 const qVal = parseFloat(document.getElementById(`q_${i}`).value) || 0;
                 const pVal = parseFloat(document.getElementById(`p_${i}`).value) || 0;
@@ -274,7 +399,7 @@
                 if (i >= 0 && i <= 3) {
                     if (qVal < minQNight && qVal > 0) {
                         minQNight = qVal;
-                        minTimeNight = default24hData[i].time;
+                        minTimeNight = currentData[i].time;
                         pDemAtMinQ = pVal;
                     }
                 }
@@ -282,9 +407,8 @@
 
             const pTB24h = sumP / 24.0;
             const qTongDay = parseFloat(document.getElementById('q_tong').value) || 1.0;
-            const N_EXPONENT = 1.5; // Chuẩn ống nhựa HDPE
+            const N_EXPONENT = 1.5; 
 
-            // 2. TÍNH Q THẤT THOÁT THÔ CHO TỪNG GIỜ VÀ CỘNG DỒN 24H
             let totalQNRWRawDay = 0;
 
             for (let i = 0; i < 24; i++) {
@@ -292,61 +416,90 @@
                 let qThoHour = 0;
 
                 if (pDemAtMinQ > 0) {
-                    // Q_thô_i = Q_MNF * (P_i / P_đêm)^1.5
                     qThoHour = minQNight * Math.pow(pVal / pDemAtMinQ, N_EXPONENT);
                 }
 
                 totalQNRWRawDay += qThoHour;
 
-                // Cập nhật giá trị vào bảng 24h
                 const qThoElem = document.getElementById(`q_tho_${i}`);
                 if (qThoElem) {
                     qThoElem.innerText = qThoHour.toFixed(2);
                 }
             }
 
-            // Tính tỷ lệ thất thoát sơ bộ (%)
             const rawPercent = (totalQNRWRawDay / qTongDay) * 100.0;
 
-            // Hiển thị kết quả Bước 1
             document.getElementById('res_raw_percent').innerText = rawPercent.toFixed(2) + " %";
             document.getElementById('res_raw_q_day').innerText = totalQNRWRawDay.toFixed(1) + " m³/ngđ";
             document.getElementById('res_q_mnf').innerText = minQNight.toFixed(2) + " m³/h";
             document.getElementById('res_mnf_time').innerText = minTimeNight;
-            document.getElementById('res_p_dem').innerText = pDemAtMinQ.toFixed(1) + " mH₂O";
-            document.getElementById('res_p_tb').innerText = pTB24h.toFixed(2) + " mH₂O";
+            document.getElementById('res_p_dem').innerText = pDemAtMinQ.toFixed(1) + " m";
+            document.getElementById('res_p_tb').innerText = pTB24h.toFixed(2) + " m";
 
-            // 3. XỬ LÝ BƯỚC 2: TÍNH GIÁ TRỊ Q NỀN IWA
-            const lM = parseFloat(document.getElementById('l_m').value) || 0; // mét
-            const lP = parseFloat(document.getElementById('l_p').value) || 0; // mét
-            const nC = parseFloat(document.getElementById('n_c').value) || 0; // hộ
+            // BƯỚC 2: TÍNH Q NỀN IWA
+            const lM = parseFloat(document.getElementById('l_m').value) || 0; 
+            const lP = parseFloat(document.getElementById('l_p').value) || 0; 
+            const nC = parseFloat(document.getElementById('n_c').value) || 0; 
 
             if (pDemAtMinQ <= 0) return;
 
-            // UBL (L/h) = (0.02*Lm + 1.25*Nc + 0.033*Lp) * (P_dem/50)^1.5
             const ublLiterHour = (0.02 * lM + 1.25 * nC + 0.033 * lP) * Math.pow(pDemAtMinQ / 50.0, N_EXPONENT);
-            const qNHour = ublLiterHour / 1000.0; // m3/h
-
-            // Quy đổi Q_n cả ngày có hiệu chỉnh P_TB
+            const qNHour = ublLiterHour / 1000.0; 
             const qNDay = 24.0 * qNHour * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
 
-            // Tính Q_n đơn vị (lít / hộ / giờ)
             let qNUnit = 0;
             if (nC > 0) {
                 qNUnit = ublLiterHour / nC;
             }
 
-            // Q Thất thoát tạm tính (chưa tính đến rò rỉ vỡ ống)
             const qLossTemp = totalQNRWRawDay - qNDay;
 
-            // Xuất kết quả Bước 2
             document.getElementById('res_q_n_hour').innerText = qNHour.toFixed(3);
             document.getElementById('res_q_n_day').innerText = qNDay.toFixed(1) + " m³/ngđ";
             document.getElementById('res_q_n_unit').innerText = qNUnit.toFixed(2);
             document.getElementById('res_q_loss_temp').innerText = qLossTemp.toFixed(1) + " m³/ngđ";
 
             document.getElementById('step2_formula_detail').innerText = 
-                `Phép tính: Q Thất thoát tạm tính = ${totalQNRWRawDay.toFixed(1)} (Q_thô 24h) - ${qNDay.toFixed(1)} (Q nền 24h) = ${qLossTemp.toFixed(1)} m³/ngđ`;
+                `Phép tính: Q Thất thoát tạm tính = ${totalQNRWRawDay.toFixed(1)} (Q rò rỉ. thô 24h) - ${qNDay.toFixed(1)} (Q nền 24h) = ${qLossTemp.toFixed(1)} m³/ngđ`;
+        }
+
+        // CÁC HÀM MODAL PATTERN
+        function openPatternModal() {
+            renderPatternSelector();
+            document.getElementById('patternModal').classList.remove('hidden');
+            document.getElementById('patternModal').classList.add('flex');
+        }
+
+        function closePatternModal() {
+            document.getElementById('patternModal').classList.add('hidden');
+            document.getElementById('patternModal').classList.remove('flex');
+        }
+
+        function renderPatternSelector() {
+            const container = document.getElementById('pattern_selector_container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const isActive = (i === activePattern);
+                const btnHtml = `
+                    <button onclick="selectActivePattern(${i})" class="p-2.5 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'}">
+                        <span>Pattern ${i}</span>
+                        ${isActive ? '<span class="text-[0.65rem] bg-yellow-400 text-yellow-950 font-extrabold px-1.5 py-0.2 rounded mt-1">ĐANG CHỌN</span>' : ''}
+                    </button>
+                `;
+                container.insertAdjacentHTML('beforeend', btnHtml);
+            }
+        }
+
+        function selectActivePattern(patNum) {
+            activePattern = patNum;
+            renderPatternSelector();
+            render24hTable();
+            calculateNRW();
+        }
+
+        function applyPatternModal() {
+            closePatternModal();
         }
 
         window.onload = function() {
