@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - HueWACO (Mô hình 2 Bước Complete)</title>
+    <title>Chương trình Tính toán NRW - HueWACO (Phân cách thập phân Phẩy & Import theo Pattern)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -32,9 +32,9 @@
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN NRW - HUEWACO</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Mô hình 2 Bước: Hiệu chỉnh Áp lực 24h & Bóc tách Q nền IWA (Hệ số N tùy chỉnh)</p>
+                <p class="text-blue-200 text-xs mt-0.5">Mô hình 2 Bước: Hiệu chỉnh Áp lực 24h & Bóc tách Q nền IWA (Hỗ trợ Import Excel theo Pattern)</p>
             </div>
-            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 4.0 Hoàn chỉnh</span>
+            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 4.5 Chuẩn</span>
         </div>
     </header>
 
@@ -58,20 +58,13 @@
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Q rò rỉ. thô từng giờ</h3>
                         
-                        <!-- CỤM NÚT IMPORT EXCEL VÀ PATTERN -->
-                        <div class="flex space-x-2">
-                            <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer shadow flex items-center transition">
-                                <i class="fa-solid fa-file-excel mr-1.5"></i> Import Excel
-                                <input type="file" id="excel_file_input" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcelData(event)">
-                            </label>
-
-                            <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center transition">
-                                <i class="fa-solid fa-table-cells mr-1.5"></i> Pattern 24h
-                            </button>
-                        </div>
+                        <!-- NÚT MỞ MODAL PATTERN (ĐÃ CHUYỂN IMPORT EXCEL VÀO TRONG MODAL) -->
+                        <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center transition">
+                            <i class="fa-solid fa-table-cells mr-1.5"></i> Quản lý Pattern 24h & Import Excel
+                        </button>
                     </div>
 
-                    <!-- BẢNG DỮ LIỆU TỪ 00H ĐẾN 23H VỚI NHÃN CỘT CẬP NHẬT -->
+                    <!-- BẢNG DỮ LIỆU TỪ 00H ĐẾN 23H VỚI NHÃN CỘT CẬP NHẬT CHUẨN -->
                     <div class="max-h-[360px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
@@ -90,7 +83,7 @@
 
                     <div class="pt-1">
                         <label class="block font-bold text-xs text-slate-700">Tổng lưu lượng cấp vào vùng trong ngày Q<sub>tổng</sub> [m³/ngđ]:</label>
-                        <input type="number" step="0.1" id="q_tong" value="918.2" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2.5 border rounded-lg font-extrabold text-blue-900 bg-blue-50/50 text-center text-sm">
+                        <input type="text" id="q_tong" value="918,2" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2.5 border rounded-lg font-extrabold text-blue-900 bg-blue-50/50 text-center text-sm">
                     </div>
 
                     <button onclick="calculateNRW()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
@@ -159,21 +152,21 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống chính L<sub>m</sub> [m]:</label>
-                            <input type="number" id="l_m" value="5000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="l_m" value="5.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống nhánh L<sub>p</sub> [m]:</label>
-                            <input type="number" id="l_p" value="2000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="l_p" value="2.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Số đấu nối N<sub>c</sub> [hộ]:</label>
-                            <input type="number" id="n_c" value="400" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="n_c" value="400" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
                         </div>
 
                         <!-- Ô NHẬP HỆ SỐ MŨ ÁP LỰC N TÙY CHỈNH -->
                         <div>
                             <label class="font-bold text-blue-900">Hệ số mũ áp lực (N):</label>
-                            <input type="number" step="0.1" id="n_exponent" value="1.5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border-2 border-emerald-500 rounded-lg font-extrabold text-center text-blue-900 bg-yellow-50">
+                            <input type="text" id="n_exponent" value="1,5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border-2 border-emerald-500 rounded-lg font-extrabold text-center text-blue-900 bg-yellow-50">
                         </div>
                     </div>
 
@@ -183,9 +176,9 @@
                             <i class="fa-solid fa-lightbulb text-amber-600 mr-1.5 text-sm"></i> HƯỚNG DẪN CHỌN HỆ SỐ MŨ ÁP LỰC (N):
                         </p>
                         <ul class="list-disc list-inside space-y-1 text-[0.72rem] text-slate-700 leading-relaxed">
-                            <li><b>N = 1.5 (Khuyên dùng HueWACO):</b> DMA cũ có &gt;90% ống nhựa (HDPE, uPVC). <i>Vết vỡ co giãn mạnh theo áp lực ban đêm.</i></li>
-                            <li><b>N = 1.0:</b> DMA hỗn hợp (tỷ lệ ống Kim loại và ống Nhựa tương đương nhau).</li>
-                            <li><b>N = 0.5:</b> DMA đa số ống Kim loại (Gang, Thép) hoặc mô phỏng lỗ xì vỡ bục lớn (định luật lỗ xì orifice).</li>
+                            <li><b>N = 1,5 (Khuyên dùng HueWACO):</b> DMA cũ có &gt;90% ống nhựa (HDPE, uPVC). <i>Vết vỡ co giãn mạnh theo áp lực ban đêm.</i></li>
+                            <li><b>N = 1,0:</b> DMA hỗn hợp (tỷ lệ ống Kim loại và ống Nhựa tương đương nhau).</li>
+                            <li><b>N = 0,5:</b> DMA đa số ống Kim loại (Gang, Thép) hoặc mô phỏng lỗ xì vỡ bục lớn (định luật lỗ xì orifice).</li>
                         </ul>
                     </div>
 
@@ -223,7 +216,7 @@
                             <span class="text-base text-red-600 font-extrabold" id="res_q_loss_temp">-- m³/ngđ</span>
                         </div>
                         <p class="text-[0.72rem] text-slate-600 font-mono bg-white p-2 rounded border border-yellow-300" id="step2_formula_detail">
-                            Phép tính: Q Thất thoát = Q rò rỉ. thô (24h) - Q nền (24h) = 0.0 - 0.0 = 0.0 m³/ngđ
+                            Phép tính: Q Thất thoát = Q rò rỉ. thô (24h) - Q nền (24h) = 0,0 - 0,0 = 0,0 m³/ngđ
                         </p>
                     </div>
                 </div>
@@ -234,31 +227,43 @@
     </main>
 
 
-    <!-- MODAL BẢNG PATTERN 24H -->
+    <!-- MODAL BẢNG PATTERN 24H VỚI TÍNH NĂNG IMPORT EXCEL TÍCH HỢP TRONG MỖI PATTERN -->
     <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
             
             <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
                 <div>
                     <h3 class="text-base font-bold flex items-center">
-                        <i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ CÁC PATTERN MẪU 24 GIỜ
+                        <i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ CÁC PATTERN MẪU 24 GIỜ & IMPORT EXCEL
                     </h3>
-                    <p class="text-xs text-blue-200 mt-0.5">Tạo các mẫu dữ liệu khác nhau và chọn Pattern kích hoạt cho mô hình</p>
+                    <p class="text-xs text-blue-200 mt-0.5">Chọn Pattern để áp dụng hoặc Import file Excel/CSV trực tiếp cho Pattern đang chọn</p>
                 </div>
                 <button onclick="closePatternModal()" class="text-slate-300 hover:text-white text-xl font-bold p-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto space-y-4">
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Chọn Pattern kích hoạt tính toán:</label>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- THANH CHỌN PATTERN KÍCH HOẠT -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">1. Chọn Pattern muốn thao tác / kích hoạt:</label>
                     <div class="grid grid-cols-5 gap-2" id="pattern_selector_container">
                         <!-- JS Render 5 Radio/Button Pattern -->
                     </div>
                 </div>
 
-                <p class="text-xs text-slate-500 italic"><i class="fa-solid fa-circle-info mr-1"></i>Mỗi Pattern lưu giữ bộ dữ liệu Lưu lượng và Áp lực theo 24 giờ khác nhau.</p>
+                <!-- NÚT IMPORT EXCEL DÀNH RIÊNG CHO PATTERN ĐANG CHỌN -->
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-emerald-900 uppercase"><i class="fa-solid fa-file-excel mr-1.5"></i>2. Nạp dữ liệu Excel cho <span id="current_editing_pat_label" class="text-blue-800 font-extrabold">Pattern 1</span>:</h4>
+                        <p class="text-[0.72rem] text-slate-600 mt-0.5">Tệp file Excel (.xlsx, .csv) chứa 24 dòng gồm các cột Lưu lượng (m3/h) và Áp lực (m).</p>
+                    </div>
+
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg cursor-pointer shadow flex items-center transition">
+                        <i class="fa-solid fa-upload mr-2"></i> Import File Excel
+                        <input type="file" id="excel_file_input" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcelDataForPattern(event)">
+                    </label>
+                </div>
             </div>
 
             <div class="bg-slate-100 px-6 py-3.5 border-t flex justify-end space-x-3">
@@ -266,7 +271,7 @@
                     Đóng
                 </button>
                 <button onclick="closePatternModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
-                    <i class="fa-solid fa-check mr-2"></i> Áp Dụng Pattern Chọn
+                    <i class="fa-solid fa-check mr-2"></i> Áp Dụng & Hoàn Tất
                 </button>
             </div>
 
@@ -274,9 +279,29 @@
     </div>
 
 
-    <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH & IMPORT EXCEL -->
+    <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH & CHUẨN HÓA DẤU PHẨY THẬP PHÂN -->
     <script>
-        // Khởi tạo Dữ liệu chuẩn từ 00h - 01h đến 23h - 24h
+        // HÀM CHUYỂN ĐỔI CHUỖI NHẬP CÓ DẤU PHẨY THÀNH SỐ NGUYÊN/FLOAT (TOÀN DIỆN)
+        function parseVietnameseNumber(val) {
+            if (val === null || val === undefined) return 0;
+            if (typeof val === 'number') return val;
+            
+            let str = String(val).trim();
+            if (str === '') return 0;
+
+            // Xóa toàn bộ dấu chấm phân cách hàng ngàn (.) và thay dấu phẩy (,) thành dấu chấm decimal (.)
+            str = str.replace(/\./g, '').replace(/,/g, '.');
+            const num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // HÀM ĐỊNH DẠNG SỐ RA CHUỖI CÓ DẤU PHẨY THẬP PHÂN ĐỂ HIỂN THỊ
+        function formatVietnameseNumber(num, decimals = 2) {
+            if (isNaN(num)) return "0";
+            return num.toFixed(decimals).replace('.', ',');
+        }
+
+        // Khởi tạo Dữ liệu mẫu chuẩn từ 00h - 01h đến 23h - 24h
         let patternsStore = {
             1: [
                 { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
@@ -306,14 +331,14 @@
             ]
         };
 
-        // Khởi tạo các Pattern 2..5 từ Pattern 1 mẫu
+        // Khởi tạo các Pattern 2..5 từ Pattern 1
         for (let p = 2; p <= 5; p++) {
             patternsStore[p] = JSON.parse(JSON.stringify(patternsStore[1]));
         }
 
         let activePattern = 1;
 
-        // Render bảng 24h chuẩn 00h đến 23h
+        // Render bảng 24h chuẩn với dấu phẩy thập phân
         function render24hTable() {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
@@ -323,14 +348,17 @@
                 const bgHighlight = item.isNight ? 'bg-yellow-50/70 font-semibold' : 'bg-white';
                 const tagNight = item.isNight ? ' <span class="text-[0.65rem] bg-yellow-200 text-yellow-800 px-1 rounded font-bold">Đêm</span>' : '';
 
+                const qStr = formatVietnameseNumber(item.q, 1);
+                const pStr = formatVietnameseNumber(item.p, 1);
+
                 const row = `
                     <tr class="${bgHighlight} border-b hover:bg-slate-100">
                         <td class="px-2 py-1 border text-center font-medium">${item.time}${tagNight}</td>
                         <td class="px-1 py-1 border">
-                            <input type="number" step="0.1" id="q_${index}" value="${item.q}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-blue-900 font-bold">
+                            <input type="text" id="q_${index}" value="${qStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-blue-900 font-bold">
                         </td>
                         <td class="px-1 py-1 border">
-                            <input type="number" step="0.1" id="p_${index}" value="${item.p}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-slate-800">
+                            <input type="text" id="p_${index}" value="${pStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-slate-800">
                         </td>
                         <td class="px-2 py-1 border text-center font-extrabold text-red-700 bg-red-50/50" id="q_tho_${index}">
                             --
@@ -342,15 +370,15 @@
         }
 
         function updateInputValue(index) {
-            const qVal = parseFloat(document.getElementById(`q_${index}`).value) || 0;
-            const pVal = parseFloat(document.getElementById(`p_${index}`).value) || 0;
-            patternsStore[activePattern][index].q = qVal;
-            patternsStore[activePattern][index].p = pVal;
+            const qStr = document.getElementById(`q_${index}`).value;
+            const pStr = document.getElementById(`p_${index}`).value;
+            patternsStore[activePattern][index].q = parseVietnameseNumber(qStr);
+            patternsStore[activePattern][index].p = parseVietnameseNumber(pStr);
             calculateNRW();
         }
 
-        // CHỨC NĂNG IMPORT DỮ LIỆU TỪ EXCEL / CSV
-        function importExcelData(event) {
+        // HÀM IMPORT EXCEL DÀNH RIÊNG CHO PATTERN ĐANG ĐƯỢC CHỌN
+        function importExcelDataForPattern(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -370,10 +398,11 @@
 
                         let qVal = null, pVal = null;
                         for (let c = 0; c < row.length; c++) {
-                            const val = parseFloat(row[c]);
-                            if (!isNaN(val)) {
-                                if (qVal === null) qVal = val;
-                                else if (pVal === null) { pVal = val; break; }
+                            const rawCell = row[c];
+                            const num = parseVietnameseNumber(rawCell);
+                            if (rawCell !== null && rawCell !== undefined && rawCell !== '' && !isNaN(num)) {
+                                if (qVal === null) qVal = num;
+                                else if (pVal === null) { pVal = num; break; }
                             }
                         }
 
@@ -386,7 +415,7 @@
 
                     render24hTable();
                     calculateNRW();
-                    alert(`Đã Import thành công ${count} khung giờ từ file Excel!`);
+                    alert(`Đã Import thành công ${count} khung giờ từ file Excel vào Pattern ${activePattern} và lưu lại!`);
                 } catch (err) {
                     alert("Lỗi khi đọc file Excel. Vui lòng kiểm tra lại định dạng tập tin!");
                 }
@@ -404,8 +433,11 @@
             const currentData = patternsStore[activePattern];
 
             for (let i = 0; i < 24; i++) {
-                const qVal = parseFloat(document.getElementById(`q_${i}`).value) || 0;
-                const pVal = parseFloat(document.getElementById(`p_${i}`).value) || 0;
+                const qElem = document.getElementById(`q_${i}`);
+                const pElem = document.getElementById(`p_${i}`);
+
+                const qVal = qElem ? parseVietnameseNumber(qElem.value) : currentData[i].q;
+                const pVal = pElem ? parseVietnameseNumber(pElem.value) : currentData[i].p;
                 
                 sumP += pVal;
 
@@ -420,15 +452,14 @@
             }
 
             const pTB24h = sumP / 24.0;
-            const qTongDay = parseFloat(document.getElementById('q_tong').value) || 1.0;
-            
-            // ĐỌC HỆ SỐ MŨ ÁP LỰC N DO NGƯỜI DÙNG NHẬP (MẶC ĐỊNH 1.5 NẾU LỖI)
-            const N_EXPONENT = parseFloat(document.getElementById('n_exponent').value) || 1.5; 
+            const qTongDay = parseVietnameseNumber(document.getElementById('q_tong').value) || 1.0;
+            const N_EXPONENT = parseVietnameseNumber(document.getElementById('n_exponent').value) || 1.5; 
 
             let totalQNRWRawDay = 0;
 
             for (let i = 0; i < 24; i++) {
-                const pVal = parseFloat(document.getElementById(`p_${i}`).value) || 0;
+                const pElem = document.getElementById(`p_${i}`);
+                const pVal = pElem ? parseVietnameseNumber(pElem.value) : currentData[i].p;
                 let qThoHour = 0;
 
                 if (pDemAtMinQ > 0) {
@@ -439,23 +470,24 @@
 
                 const qThoElem = document.getElementById(`q_tho_${i}`);
                 if (qThoElem) {
-                    qThoElem.innerText = qThoHour.toFixed(2);
+                    qThoElem.innerText = formatVietnameseNumber(qThoHour, 2);
                 }
             }
 
             const rawPercent = (totalQNRWRawDay / qTongDay) * 100.0;
 
-            document.getElementById('res_raw_percent').innerText = rawPercent.toFixed(2) + " %";
-            document.getElementById('res_raw_q_day').innerText = totalQNRWRawDay.toFixed(1) + " m³/ngđ";
-            document.getElementById('res_q_mnf').innerText = minQNight.toFixed(2) + " m³/h";
+            // HIỂN THỊ KẾT QUẢ BƯỚC 1 THEO ĐÚNG CHUẨN DẤU PHẨY THẬP PHÂN
+            document.getElementById('res_raw_percent').innerText = formatVietnameseNumber(rawPercent, 2) + " %";
+            document.getElementById('res_raw_q_day').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
+            document.getElementById('res_q_mnf').innerText = formatVietnameseNumber(minQNight, 2) + " m³/h";
             document.getElementById('res_mnf_time').innerText = minTimeNight;
-            document.getElementById('res_p_dem').innerText = pDemAtMinQ.toFixed(1) + " m";
-            document.getElementById('res_p_tb').innerText = pTB24h.toFixed(2) + " m";
+            document.getElementById('res_p_dem').innerText = formatVietnameseNumber(pDemAtMinQ, 1) + " m";
+            document.getElementById('res_p_tb').innerText = formatVietnameseNumber(pTB24h, 2) + " m";
 
             // BƯỚC 2: TÍNH Q NỀN IWA THEO HỆ SỐ N TÙY CHỈNH
-            const lM = parseFloat(document.getElementById('l_m').value) || 0; 
-            const lP = parseFloat(document.getElementById('l_p').value) || 0; 
-            const nC = parseFloat(document.getElementById('n_c').value) || 0; 
+            const lM = parseVietnameseNumber(document.getElementById('l_m').value); 
+            const lP = parseVietnameseNumber(document.getElementById('l_p').value); 
+            const nC = parseVietnameseNumber(document.getElementById('n_c').value); 
 
             if (pDemAtMinQ <= 0) return;
 
@@ -470,18 +502,19 @@
 
             const qLossTemp = totalQNRWRawDay - qNDay;
 
-            document.getElementById('res_q_n_hour').innerText = qNHour.toFixed(3);
-            document.getElementById('res_q_n_day').innerText = qNDay.toFixed(1) + " m³/ngđ";
-            document.getElementById('res_q_n_unit').innerText = qNUnit.toFixed(2);
-            document.getElementById('res_q_loss_temp').innerText = qLossTemp.toFixed(1) + " m³/ngđ";
+            document.getElementById('res_q_n_hour').innerText = formatVietnameseNumber(qNHour, 3);
+            document.getElementById('res_q_n_day').innerText = formatVietnameseNumber(qNDay, 1) + " m³/ngđ";
+            document.getElementById('res_q_n_unit').innerText = formatVietnameseNumber(qNUnit, 2);
+            document.getElementById('res_q_loss_temp').innerText = formatVietnameseNumber(qLossTemp, 1) + " m³/ngđ";
 
             document.getElementById('step2_formula_detail').innerText = 
-                `Phép tính: Q Thất thoát tạm tính = ${totalQNRWRawDay.toFixed(1)} (Q rò rỉ. thô 24h) - ${qNDay.toFixed(1)} (Q nền 24h, N=${N_EXPONENT}) = ${qLossTemp.toFixed(1)} m³/ngđ`;
+                `Phép tính: Q Thất thoát tạm tính = ${formatVietnameseNumber(totalQNRWRawDay, 1)} (Q rò rỉ. thô 24h) - ${formatVietnameseNumber(qNDay, 1)} (Q nền 24h, N=${N_EXPONENT}) = ${formatVietnameseNumber(qLossTemp, 1)} m³/ngđ`;
         }
 
         // CÁC HÀM MODAL PATTERN
         function openPatternModal() {
             renderPatternSelector();
+            document.getElementById('current_editing_pat_label').innerText = `Pattern ${activePattern}`;
             document.getElementById('patternModal').classList.remove('hidden');
             document.getElementById('patternModal').classList.add('flex');
         }
@@ -509,6 +542,7 @@
 
         function selectActivePattern(patNum) {
             activePattern = patNum;
+            document.getElementById('current_editing_pat_label').innerText = `Pattern ${activePattern}`;
             renderPatternSelector();
             render24hTable();
             calculateNRW();
