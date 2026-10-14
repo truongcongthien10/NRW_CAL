@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - HueWACO (Hoàn chỉnh 5 Bước - Excel Style)</title>
+    <title>Chương trình Tính toán NRW - HueWACO (So sánh Trước/Sau NRW & Bảng IWA Mở rộng)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -17,10 +17,10 @@
         table.excel-table {
             border-collapse: collapse;
             width: 100%;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
         table.excel-table th, table.excel-table td {
-            border: 1px solid #cbd5e1; /* Đường nét mảnh chân phương màu xám nhẹ */
+            border: 1px solid #cbd5e1;
             padding: 4px 8px;
         }
         table.excel-table th {
@@ -44,7 +44,6 @@
             background-color: #fef08a !important;
             border-color: #ca8a04 !important;
             outline: none;
-            box-shadow: none;
         }
         .sub-text { font-size: 0.72rem; color: #64748b; margin-top: 0.15rem; display: block; }
 
@@ -62,13 +61,13 @@
         <div class="max-w-7xl mx-auto px-4 py-3.5 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
                 <h1 class="text-lg font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN NRW - HUEWACO</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Mô hình 5 Bước Hoàn chỉnh: Hiệu chỉnh P 24h - Q Nền IWA - Bóc tách Nước Đêm & Điểm Rò Rỉ - Bảng IWA & Biểu đồ</p>
+                <p class="text-blue-200 text-xs mt-0.5">Mô hình 5 Bước: Bảng Cân bằng Nước IWA Mở rộng & Biểu đồ So sánh Thủy lực Trước/Sau NRW</p>
             </div>
             <div class="flex items-center space-x-2">
                 <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center transition shadow-sm">
                     <i class="fa-solid fa-print mr-1.5"></i> In Báo Cáo
                 </button>
-                <span class="text-xs bg-blue-800 border border-blue-700 px-2.5 py-1 rounded text-blue-200">Phiên bản 6.0 Final</span>
+                <span class="text-xs bg-blue-800 border border-blue-700 px-2.5 py-1 rounded text-blue-200">Phiên bản 7.0 Custom</span>
             </div>
         </div>
     </header>
@@ -88,7 +87,6 @@
 
             <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <!-- BẢNG DỮ LIỆU ĐO ĐẠC NHU CẦU 24H DẠNG EXCEL CHÂN PHƯƠNG -->
                 <div class="lg:col-span-7 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-table text-blue-600 mr-1.5"></i>Bảng dữ liệu nhu cầu 24h & Q rò rỉ thô từng giờ</h3>
@@ -98,7 +96,6 @@
                         </button>
                     </div>
 
-                    <!-- KHOANG BẢNG EXCEL MỎNG NHẸ KHÔNG RỐI MẮT -->
                     <div class="max-h-[380px] overflow-y-auto border border-slate-300 bg-white">
                         <table class="excel-table">
                             <thead>
@@ -125,7 +122,6 @@
                     </button>
                 </div>
 
-                <!-- KẾT QUẢ BƯỚC 1 -->
                 <div class="lg:col-span-5 space-y-3">
                     <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-1.5"></i>Kết quả Thất thoát Sơ bộ</h3>
                     
@@ -288,7 +284,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="leak_list_tbody">
-                                    <!-- JS Render điểm rò rỉ kiểu Excel -->
+                                    <!-- JS Render điểm rò rỉ -->
                                 </tbody>
                             </table>
                         </div>
@@ -341,58 +337,118 @@
 
 
         <!-- ========================================================================= -->
-        <!-- BƯỚC 4: BẢNG CÂN BẰNG NƯỚC IWA TIÊU CHUẨN (WATER BALANCE TABLE) -->
+        <!-- BƯỚC 4: BẢNG CÂN BẰNG NƯỚC IWA MỞ RỘNG (WATER BALANCE FULL EXPANDED) -->
         <!-- ========================================================================= -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
             <div class="bg-slate-800 text-white px-5 py-2.5 flex justify-between items-center">
                 <h2 class="text-sm font-bold uppercase flex items-center">
-                    <i class="fa-solid fa-table-list text-yellow-400 mr-2"></i> BƯỚC 4: BẢNG CÂN BẰNG NƯỚC TIÊU CHUẨN IWA (WATER BALANCE)
+                    <i class="fa-solid fa-table-list text-yellow-400 mr-2"></i> BƯỚC 4: BẢNG CÂN BẰNG NƯỚC TIÊU CHUẨN IWA MỞ RỘNG (WATER BALANCE)
                 </h2>
-                <span class="text-xs bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded">Khung chuẩn Quốc tế IWA</span>
+                <span class="text-xs bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded">Khung chuẩn Quốc tế IWA đầy đủ thành phần</span>
             </div>
 
-            <div class="p-5">
+            <div class="p-5 space-y-4">
                 <div class="overflow-x-auto border border-slate-300 bg-white">
                     <table class="excel-table text-center">
                         <thead>
                             <tr>
-                                <th rowspan="4" class="w-1/4 bg-slate-200">TỔNG LƯỢNG NƯỚC CẤP ĐẦU VÀO (SIV)<br><span class="text-blue-900 font-extrabold text-sm" id="iwa_siv">-- m³/ngđ</span></th>
-                                <td colspan="2" class="bg-emerald-100 font-bold">NƯỚC TIÊU THỤ CÓ PHÉP<br><span id="iwa_auth_cons">-- m³/ngđ</span></td>
-                                <td colspan="2" class="bg-blue-50 font-bold">Lượng nước thương mại / Doanh thu</td>
+                                <th rowspan="6" class="w-1/5 bg-slate-200">
+                                    TỔNG LƯỢNG NƯỚC CẤP ĐẦU VÀO (SIV)<br>
+                                    <span class="text-blue-900 font-extrabold text-sm" id="iwa_siv">-- m³/ngđ</span>
+                                </th>
+                                <td colspan="2" class="bg-emerald-100 font-bold">
+                                    NƯỚC TIÊU THỤ CÓ PHÉP (AUTHORIZED CONSUMPTION)<br>
+                                    <span id="iwa_auth_cons" class="text-emerald-900 font-bold">-- m³/ngđ</span>
+                                </td>
+                                <td class="bg-blue-50 font-bold text-blue-900">
+                                    Lượng nước Doanh thu (Billed Authorized): <span id="iwa_billed_val">--</span> m³/ngđ
+                                </td>
                             </tr>
                             <tr>
-                                <td rowspan="3" class="bg-red-100 font-bold">TẤT THOÁT NƯỚC (NRW)<br><span class="text-red-700 font-extrabold text-sm" id="iwa_nrw_total">-- m³/ngđ</span></td>
-                                <td class="bg-amber-100 font-bold">Thất thoát Thương mại (Apparent Losses)</td>
-                                <td class="bg-amber-50">Thất thoát do đồng hồ / Gian lận nước</td>
+                                <td colspan="2" class="bg-emerald-50">
+                                    • Nước Chia sẻ / Xuất bán ngoài vùng (Exported): <b id="iwa_exported_val" class="text-emerald-800">0,0</b> m³/ngđ
+                                </td>
+                                <td class="bg-emerald-50 text-slate-700">
+                                    • Nước Giảm chảy / Tiêu thụ có phép không thu tiền: <b id="iwa_unbilled_val" class="text-slate-900">0,0</b> m³/ngđ
+                                </td>
                             </tr>
                             <tr>
-                                <td rowspan="2" class="bg-red-200 font-bold">THẤT THOÁT THỰC SỰ (REAL LOSSES)<br><span class="text-red-900 font-extrabold" id="iwa_real_losses">-- m³/ngđ</span></td>
-                                <td class="bg-red-50 text-left px-3">1. Rò rỉ nền cho phép (UBL): <b class="float-right text-emerald-800" id="iwa_ubl">-- m³/ngđ</b></td>
+                                <td rowspan="4" class="bg-red-100 font-bold">
+                                    TẤT THOÁT NƯỚC (NRW)<br>
+                                    <span class="text-red-700 font-extrabold text-sm" id="iwa_nrw_total">-- m³/ngđ</span>
+                                </td>
+                                <td class="bg-amber-100 font-bold">
+                                    Thất thoát Thương mại (Apparent Losses): <span id="iwa_apparent_total">0,0</span> m³/ngđ
+                                </td>
+                                <td class="bg-amber-50 text-left px-3">
+                                    • Thất thoát do Sai số Đồng hồ & Gian lận
+                                </td>
                             </tr>
                             <tr>
-                                <td class="bg-red-50 text-left px-3">2. Rò rỉ vỡ ống thực sự (Bursts): <b class="float-right text-red-700" id="iwa_bursts">-- m³/ngđ</b></td>
+                                <td rowspan="3" class="bg-red-200 font-bold">
+                                    THẤT THOÁT THỰC SỰ (REAL LOSSES)<br>
+                                    <span class="text-red-900 font-extrabold" id="iwa_real_losses">-- m³/ngđ</span>
+                                </td>
+                                <td class="bg-red-50 text-left px-3">
+                                    1. Rò rỉ nền cho phép (UBL): <b class="float-right text-emerald-800" id="iwa_ubl">-- m³/ngđ</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-red-50 text-left px-3">
+                                    2. Rò rỉ vỡ ống thực sự (Bursts): <b class="float-right text-red-700" id="iwa_bursts">-- m³/ngđ</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-red-50 text-left px-3">
+                                    3. Rò rỉ / Thất thoát sau đồng hồ khách hàng: <b class="float-right text-purple-800" id="iwa_postmeter_val">0,0 m³/ngđ</b>
+                                </td>
                             </tr>
                         </thead>
                     </table>
+                </div>
+
+                <!-- TÙY CHỈNH NHẬP CÁC CHỈ SỐ MỞ RỘNG BƯỚC 4 -->
+                <div class="bg-slate-50 p-3 rounded border border-slate-300 text-xs space-y-2 no-print">
+                    <p class="font-bold text-slate-700"><i class="fa-solid fa-pen-to-square mr-1"></i> Nhập bổ sung các chỉ số Cân bằng nước khác (m³/ngđ):</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-slate-600">Nước chia sẻ / Xuất vùng [m³/ngđ]:</label>
+                            <input type="text" id="inp_exported_water" value="0,0" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1 border rounded text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="text-slate-600">Nước giảm chảy (Không thu tiền) [m³/ngđ]:</label>
+                            <input type="text" id="inp_unbilled_water" value="0,0" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1 border rounded text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="text-slate-600">Nước chảy sau đồng hồ KH [m³/ngđ]:</label>
+                            <input type="text" id="inp_postmeter_water" value="0,0" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1 border rounded text-center font-bold">
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
 
         <!-- ========================================================================= -->
-        <!-- BƯỚC 5: BIỂU ĐỒ ĐƯỜNG CONG THỦY LỰC 24 GIỜ (PATTERN GRAPHIC) -->
+        <!-- BƯỚC 5: BIỂU ĐỒ SO SÁNH THỦY LỰC TRƯỚC VÀ SAU THỰC HIỆN NRW -->
         <!-- ========================================================================= -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden no-print">
             <div class="bg-teal-900 text-white px-5 py-2.5 flex justify-between items-center">
                 <h2 class="text-sm font-bold uppercase flex items-center">
-                    <i class="fa-solid fa-chart-line text-yellow-400 mr-2"></i> BƯỚC 5: BIỂU ĐỒ ĐƯỜNG CONG LƯU LƯỢNG & ÁP LỰC 24 GIỜ
+                    <i class="fa-solid fa-chart-line text-yellow-400 mr-2"></i> BƯỚC 5: BIỂU ĐỒ SO SÁNH THỦY LỰC (LƯU LƯỢNG Q & ÁP LỰC P) TRƯỚC VA SAU NRW
                 </h2>
-                <span class="text-xs bg-teal-800 text-teal-100 px-2.5 py-0.5 rounded">Trực quan hóa Pattern thủy lực</span>
+                <span class="text-xs bg-teal-800 text-teal-100 px-2.5 py-0.5 rounded">So sánh hiệu quả khắc phục rò rỉ</span>
             </div>
 
-            <div class="p-5">
-                <div class="h-72 w-full bg-slate-50 p-2 rounded border border-slate-300">
+            <div class="p-5 space-y-3">
+                <div class="h-80 w-full bg-slate-50 p-2 rounded border border-slate-300">
                     <canvas id="patternChart"></canvas>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-bold pt-1">
+                    <span class="flex items-center text-blue-700"><span class="w-4 h-1 bg-blue-700 inline-block mr-1"></span> Q Trước NRW (m³/h)</span>
+                    <span class="flex items-center text-amber-600"><span class="w-4 h-0.5 bg-amber-600 border-b border-dashed border-amber-600 inline-block mr-1"></span> P Trước NRW (m)</span>
+                    <span class="flex items-center text-teal-600"><span class="w-4 h-1 bg-teal-600 inline-block mr-1"></span> Q Sau NRW (Đã sửa rò rỉ)</span>
+                    <span class="flex items-center text-emerald-600"><span class="w-4 h-0.5 bg-emerald-600 border-b border-dashed border-emerald-600 inline-block mr-1"></span> P Sau NRW (Áp lực hồi phục)</span>
                 </div>
             </div>
         </section>
@@ -465,7 +521,7 @@
     </div>
 
 
-    <!-- JAVASCRIPT XỬ LÝ TOÀN BỘ CHƯƠNG TRÌNH & BIỂU ĐỒ CHART.JS -->
+    <!-- JAVASCRIPT XỬ LÝ CHƯƠNG TRÌNH & CHART.JS SO SÁNH TRƯỚC / SAU NRW -->
     <script>
         function parseVietnameseNumber(val) {
             if (val === null || val === undefined) return 0;
@@ -521,7 +577,6 @@
         ];
         let myChart = null;
 
-        // Render bảng dữ liệu Excel chân phương
         function render24hTable() {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
@@ -689,7 +744,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // HÀM TÍNH TOÁN CẢ 5 BƯỚC VÀ VẼ BIỂU ĐỒ
         function calculateNRW() {
             let sumP = 0;
             let minQNight = Infinity;
@@ -697,8 +751,10 @@
             let pDemAtMinQ = 0;
 
             const currentData = patternsStore[activePattern];
-            const qArray = [];
-            const pArray = [];
+            const qBefore = [];
+            const pBefore = [];
+            const qAfter = [];
+            const pAfter = [];
             const timeLabels = [];
 
             for (let i = 0; i < 24; i++) {
@@ -709,8 +765,8 @@
                 const pVal = pElem ? parseVietnameseNumber(pElem.value) : currentData[i].p;
                 
                 sumP += pVal;
-                qArray.push(qVal);
-                pArray.push(pVal);
+                qBefore.push(qVal);
+                pBefore.push(pVal);
                 timeLabels.push(currentData[i].time.split(' ')[0]);
 
                 if (i >= 0 && i <= 3) {
@@ -791,20 +847,40 @@
             document.getElementById('b3_q_cust').innerText = formatVietnameseNumber(qCustNight, 2) + " m³/h";
             document.getElementById('b3_q_leak_pts').innerText = formatVietnameseNumber(qLeakPointsM3h, 3) + " m³/h";
 
-            // BƯỚC 4: RENDER BẢNG IWA WATER BALANCE
+            // TÍNH MÔ PHỎNG DỮ LIỆU SAU NRW DÀNH CHO BƯỚC 5 (Giảm rò rỉ vỡ ống, áp lực hồi phục)
+            for (let i = 0; i < 24; i++) {
+                const qB = qBefore[i];
+                const pB = pBefore[i];
+                const qReduced = qB - (qBurstNight * Math.pow(pB / pDemAtMinQ, N_EXPONENT));
+                qAfter.push(qReduced > 0 ? qReduced : qB * 0.85);
+                pAfter.push(pB * 1.05); // Áp lực tăng nhẹ ~5% sau khi khắc phục rò rỉ
+            }
+
+            // BƯỚC 4: BẢNG IWA MỞ RỘNG
+            const exportedW = parseVietnameseNumber(document.getElementById('inp_exported_water').value);
+            const unbilledW = parseVietnameseNumber(document.getElementById('inp_unbilled_water').value);
+            const postmeterW = parseVietnameseNumber(document.getElementById('inp_postmeter_water').value);
+
             document.getElementById('iwa_siv').innerText = formatVietnameseNumber(qTongDay, 1) + " m³/ngđ";
-            const iwaAuth = qTongDay - totalQNRWRawDay;
-            document.getElementById('iwa_auth_cons').innerText = formatVietnameseNumber(iwaAuth > 0 ? iwaAuth : 0, 1) + " m³/ngđ";
+            const iwaAuthTotal = qTongDay - totalQNRWRawDay;
+            const billedW = iwaAuthTotal - exportedW - unbilledW;
+
+            document.getElementById('iwa_auth_cons').innerText = formatVietnameseNumber(iwaAuthTotal > 0 ? iwaAuthTotal : 0, 1) + " m³/ngđ";
+            document.getElementById('iwa_billed_val').innerText = formatVietnameseNumber(billedW > 0 ? billedW : 0, 1);
+            document.getElementById('iwa_exported_val').innerText = formatVietnameseNumber(exportedW, 1);
+            document.getElementById('iwa_unbilled_val').innerText = formatVietnameseNumber(unbilledW, 1);
+
             document.getElementById('iwa_nrw_total').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
             document.getElementById('iwa_real_losses').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
             document.getElementById('iwa_ubl').innerText = formatVietnameseNumber(qNDay, 1) + " m³/ngđ";
-            document.getElementById('iwa_bursts').innerText = formatVietnameseNumber(totalQNRWRawDay - qNDay, 1) + " m³/ngđ";
+            document.getElementById('iwa_bursts').innerText = formatVietnameseNumber(totalQNRWRawDay - qNDay - postmeterW, 1) + " m³/ngđ";
+            document.getElementById('iwa_postmeter_val').innerText = formatVietnameseNumber(postmeterW, 1) + " m³/ngđ";
 
-            // BƯỚC 5: VẼ BIỂU ĐỒ CHART.JS
-            renderChart(timeLabels, qArray, pArray);
+            // BƯỚC 5: BIỂU ĐỒ SO SÁNH CHART.JS
+            renderChart(timeLabels, qBefore, pBefore, qAfter, pAfter);
         }
 
-        function renderChart(labels, qData, pData) {
+        function renderChart(labels, qBefore, pBefore, qAfter, pAfter) {
             const ctx = document.getElementById('patternChart').getContext('2d');
             if (myChart) myChart.destroy();
 
@@ -814,19 +890,37 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Lưu lượng Q (m³/h)',
-                            data: qData,
+                            label: 'Q Trước NRW (m³/h)',
+                            data: qBefore,
                             borderColor: '#1d4ed8',
-                            backgroundColor: 'rgba(29, 78, 216, 0.1)',
+                            backgroundColor: 'rgba(29, 78, 216, 0.05)',
+                            borderWidth: 2.5,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'P Trước NRW (m)',
+                            data: pBefore,
+                            borderColor: '#d97706',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'Q Sau NRW (m³/h)',
+                            data: qAfter,
+                            borderColor: '#0d9488',
+                            backgroundColor: 'transparent',
                             borderWidth: 2,
                             tension: 0.3,
                             yAxisID: 'y'
                         },
                         {
-                            label: 'Áp lực P (m)',
-                            data: pData,
-                            borderColor: '#d97706',
-                            borderDash: [5, 5],
+                            label: 'P Sau NRW (m)',
+                            data: pAfter,
+                            borderColor: '#16a34a',
+                            borderDash: [3, 3],
                             borderWidth: 2,
                             tension: 0.3,
                             yAxisID: 'y1'
@@ -837,12 +931,12 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top', labels: { font: { size: 11, weight: 'bold' } } }
+                        legend: { display: false }
                     },
                     scales: {
                         x: { grid: { color: '#e2e8f0' } },
-                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Lưu lượng (m³/h)' } },
-                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Áp lực (m)' } }
+                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Lưu lượng Q (m³/h)' } },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Áp lực P (m)' } }
                     }
                 }
             });
