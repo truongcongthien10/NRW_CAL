@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - Chuẩn 00h đến 23h</title>
+    <title>Chương trình Tính toán NRW - HueWACO (Mô hình 2 Bước Complete)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -31,17 +31,17 @@
     <header class="bg-blue-900 text-white shadow-lg mb-6">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>CHƯƠNG TRÌNH TÍNH TOÁN NRW</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Dữ liệu chuẩn 00h-23h | Hiệu chỉnh Áp lực 24h & Bóc tách Q nền IWA</p>
+                <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN NRW - HUEWACO</h1>
+                <p class="text-blue-200 text-xs mt-0.5">Mô hình 2 Bước: Hiệu chỉnh Áp lực 24h & Bóc tách Q nền IWA (Hệ số N tùy chỉnh)</p>
             </div>
-            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 3.6 Chuẩn</span>
+            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 4.0 Hoàn chỉnh</span>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         <!-- ========================================================================= -->
-        <!-- BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ TÍNH THEO ÁP LỰC 24H -->
+        <!-- BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH ÁP LỰC 24H) -->
         <!-- ========================================================================= -->
         <section class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
             <div class="bg-blue-800 text-white px-6 py-3.5 flex justify-between items-center">
@@ -53,7 +53,7 @@
 
             <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H (00H TỚI 23H) -->
+                <!-- CỘT BÊN TRÁI: BẢNG DỮ LIỆU ĐO ĐẠC 24H (00H ĐẾN 23H) -->
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Q rò rỉ. thô từng giờ</h3>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <!-- BẢNG DỮ LIỆU TỪ 00H ĐẾN 23H VỚI NHÃN CỘT DỮ LIỆU CHUẨN -->
+                    <!-- BẢNG DỮ LIỆU TỪ 00H ĐẾN 23H VỚI NHÃN CỘT CẬP NHẬT -->
                     <div class="max-h-[360px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
@@ -83,14 +83,14 @@
                                 </tr>
                             </thead>
                             <tbody id="step1_24h_tbody" class="divide-y">
-                                <!-- JS sẽ render 24 dòng chính xác từ 00h-01h đến 23h-24h -->
+                                <!-- JS sẽ render 24 dòng từ 00h-01h đến 23h-24h -->
                             </tbody>
                         </table>
                     </div>
 
                     <div class="pt-1">
                         <label class="block font-bold text-xs text-slate-700">Tổng lưu lượng cấp vào vùng trong ngày Q<sub>tổng</sub> [m³/ngđ]:</label>
-                        <input type="number" step="0.1" id="q_tong" value="918.2" onclick="this.select()" class="mt-1 w-full p-2.5 border rounded-lg font-extrabold text-blue-900 bg-blue-50/50 text-center text-sm">
+                        <input type="number" step="0.1" id="q_tong" value="918.2" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2.5 border rounded-lg font-extrabold text-blue-900 bg-blue-50/50 text-center text-sm">
                     </div>
 
                     <button onclick="calculateNRW()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
@@ -140,40 +140,58 @@
 
 
         <!-- ========================================================================= -->
-        <!-- BƯỚC 2: PHẦN TÍNH GIÁ TRỊ Q NỀN (CÔNG THỨC IWA THỐNG NHẤT) -->
+        <!-- BƯỚC 2: PHẦN TÍNH GIÁ TRỊ Q NỀN (CÔNG THỨC IWA - HỆ SỐ N TỦY CHỈNH) -->
         <!-- ========================================================================= -->
         <section class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
             <div class="bg-emerald-800 text-white px-6 py-3.5 flex justify-between items-center">
                 <h2 class="text-base font-bold uppercase flex items-center">
                     <i class="fa-solid fa-network-wired text-yellow-400 mr-2.5"></i> BƯỚC 2: TÍNH GIÁ TRỊ THẤT THOÁT NỀN (Q NỀN IWA)
                 </h2>
-                <span class="text-xs bg-emerald-700 text-emerald-100 px-3 py-0.5 rounded-full">Công thức IWA (N=1.5 cho ống HDPE)</span>
+                <span class="text-xs bg-emerald-700 text-emerald-100 px-3 py-0.5 rounded-full">Bóc tách UBL theo Tiêu chuẩn IWA</span>
             </div>
 
             <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- CỘT BÊN TRÁI: NHẬP THÔNG SỐ HẠ TẦNG -->
+                <!-- CỘT BÊN TRÁI: NHẬP THÔNG SỐ HẠ TẦNG & HỆ SỐ N TỦY CHỈNH -->
                 <div class="lg:col-span-6 space-y-4">
-                    <h3 class="font-bold text-emerald-800 text-sm border-b pb-2"><i class="fa-solid fa-sliders text-emerald-600 mr-2"></i>Thông số Hạ tầng DMA</h3>
+                    <h3 class="font-bold text-emerald-800 text-sm border-b pb-2"><i class="fa-solid fa-sliders text-emerald-600 mr-2"></i>Thông số Hạ tầng DMA & Hệ số Thủy lực</h3>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống chính L<sub>m</sub> [m]:</label>
-                            <input type="number" id="l_m" value="5000" onclick="this.select()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="number" id="l_m" value="5000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống nhánh L<sub>p</sub> [m]:</label>
-                            <input type="number" id="l_p" value="2000" onclick="this.select()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="number" id="l_p" value="2000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Số đấu nối N<sub>c</sub> [hộ]:</label>
-                            <input type="number" id="n_c" value="400" onclick="this.select()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="number" id="n_c" value="400" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                        </div>
+
+                        <!-- Ô NHẬP HỆ SỐ MŨ ÁP LỰC N TÙY CHỈNH -->
+                        <div>
+                            <label class="font-bold text-blue-900">Hệ số mũ áp lực (N):</label>
+                            <input type="number" step="0.1" id="n_exponent" value="1.5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border-2 border-emerald-500 rounded-lg font-extrabold text-center text-blue-900 bg-yellow-50">
                         </div>
                     </div>
 
-                    <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-200 text-xs text-emerald-900 space-y-1">
-                        <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i>Công thức IWA áp dụng:</p>
-                        <p class="font-mono text-[0.7rem]">Q<sub>n/giờ</sub> = [(0.02×L<sub>m</sub> + 1.25×N<sub>c</sub> + 0.033×L<sub>p</sub>) × (P<sub>đêm</sub>/50)<sup>1.5</sup>] / 1000  (m³/h)</p>
+                    <!-- KHUNG CHÚ GIẢI HƯỚNG DẪN CHỌN HỆ SỐ N -->
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-xs text-amber-900 space-y-1.5 shadow-sm">
+                        <p class="font-bold text-amber-950 flex items-center">
+                            <i class="fa-solid fa-lightbulb text-amber-600 mr-1.5 text-sm"></i> HƯỚNG DẪN CHỌN HỆ SỐ MŨ ÁP LỰC (N):
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-[0.72rem] text-slate-700 leading-relaxed">
+                            <li><b>N = 1.5 (Khuyên dùng HueWACO):</b> DMA cũ có &gt;90% ống nhựa (HDPE, uPVC). <i>Vết vỡ co giãn mạnh theo áp lực ban đêm.</i></li>
+                            <li><b>N = 1.0:</b> DMA hỗn hợp (tỷ lệ ống Kim loại và ống Nhựa tương đương nhau).</li>
+                            <li><b>N = 0.5:</b> DMA đa số ống Kim loại (Gang, Thép) hoặc mô phỏng lỗ xì vỡ bục lớn (định luật lỗ xì orifice).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-200 text-xs text-emerald-900 space-y-1">
+                        <p class="font-bold"><i class="fa-solid fa-square-root-variable mr-1"></i>Công thức IWA áp dụng:</p>
+                        <p class="font-mono text-[0.7rem]">Q<sub>n/giờ</sub> = [(0.02×L<sub>m</sub> + 1.25×N<sub>c</sub> + 0.033×L<sub>p</sub>) × (P<sub>đêm</sub>/50)<sup>N</sup>] / 1000  (m³/h)</p>
                     </div>
 
                     <button onclick="calculateNRW()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
@@ -247,7 +265,7 @@
                 <button onclick="closePatternModal()" class="px-5 py-2 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded-lg transition">
                     Đóng
                 </button>
-                <button onclick="applyPatternModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
+                <button onclick="closePatternModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
                     <i class="fa-solid fa-check mr-2"></i> Áp Dụng Pattern Chọn
                 </button>
             </div>
@@ -403,7 +421,9 @@
 
             const pTB24h = sumP / 24.0;
             const qTongDay = parseFloat(document.getElementById('q_tong').value) || 1.0;
-            const N_EXPONENT = 1.5; 
+            
+            // ĐỌC HỆ SỐ MŨ ÁP LỰC N DO NGƯỜI DÙNG NHẬP (MẶC ĐỊNH 1.5 NẾU LỖI)
+            const N_EXPONENT = parseFloat(document.getElementById('n_exponent').value) || 1.5; 
 
             let totalQNRWRawDay = 0;
 
@@ -432,7 +452,7 @@
             document.getElementById('res_p_dem').innerText = pDemAtMinQ.toFixed(1) + " m";
             document.getElementById('res_p_tb').innerText = pTB24h.toFixed(2) + " m";
 
-            // BƯỚC 2: TÍNH Q NỀN IWA
+            // BƯỚC 2: TÍNH Q NỀN IWA THEO HỆ SỐ N TÙY CHỈNH
             const lM = parseFloat(document.getElementById('l_m').value) || 0; 
             const lP = parseFloat(document.getElementById('l_p').value) || 0; 
             const nC = parseFloat(document.getElementById('n_c').value) || 0; 
@@ -456,7 +476,7 @@
             document.getElementById('res_q_loss_temp').innerText = qLossTemp.toFixed(1) + " m³/ngđ";
 
             document.getElementById('step2_formula_detail').innerText = 
-                `Phép tính: Q Thất thoát tạm tính = ${totalQNRWRawDay.toFixed(1)} (Q rò rỉ. thô 24h) - ${qNDay.toFixed(1)} (Q nền 24h) = ${qLossTemp.toFixed(1)} m³/ngđ`;
+                `Phép tính: Q Thất thoát tạm tính = ${totalQNRWRawDay.toFixed(1)} (Q rò rỉ. thô 24h) - ${qNDay.toFixed(1)} (Q nền 24h, N=${N_EXPONENT}) = ${qLossTemp.toFixed(1)} m³/ngđ`;
         }
 
         // CÁC HÀM MODAL PATTERN
@@ -492,10 +512,6 @@
             renderPatternSelector();
             render24hTable();
             calculateNRW();
-        }
-
-        function applyPatternModal() {
-            closePatternModal();
         }
 
         window.onload = function() {
