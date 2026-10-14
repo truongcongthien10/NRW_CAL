@@ -3,117 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chương trình Tính toán NRW - HueWACO (Đủ 3 Bước & Quản lý Điểm Rò Rỉ)</title>
+    <title>Chương trình Tính toán NRW - HueWACO (Hoàn chỉnh 5 Bước - Excel Style)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Thư viện đọc file Excel SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Thư viện vẽ Biểu đồ Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        input:focus {
+        /* Phong cách Bảng Excel chân phương */
+        table.excel-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.8rem;
+        }
+        table.excel-table th, table.excel-table td {
+            border: 1px solid #cbd5e1; /* Đường nét mảnh chân phương màu xám nhẹ */
+            padding: 4px 8px;
+        }
+        table.excel-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            text-align: center;
+        }
+        input.excel-input {
+            width: 100%;
+            text-align: center;
+            background: transparent;
+            border: 1px solid transparent;
+            font-weight: 600;
+        }
+        input.excel-input:hover {
+            border-color: #94a3b8;
+            background-color: #ffffff;
+        }
+        input.excel-input:focus {
             background-color: #fef08a !important;
-            border-color: #eab308 !important;
+            border-color: #ca8a04 !important;
             outline: none;
+            box-shadow: none;
         }
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] { -moz-appearance: textfield; }
         .sub-text { font-size: 0.72rem; color: #64748b; margin-top: 0.15rem; display: block; }
+
+        @media print {
+            body { background: white; }
+            header, button, label, .no-print { display: none !important; }
+            section { box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 20px !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-12">
 
     <!-- Header Section -->
-    <header class="bg-blue-900 text-white shadow-lg mb-6">
-        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <header class="bg-blue-900 text-white shadow mb-6">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN NRW - HUEWACO</h1>
-                <p class="text-blue-200 text-xs mt-0.5">Mô hình 3 Bước: Hiệu chỉnh Áp lực 24h - Q Nền IWA - Bóc tách Nước Đêm & Quản lý Điểm Rò Rỉ</p>
+                <h1 class="text-lg font-bold tracking-tight"><i class="fa-solid fa-droplet text-blue-400 mr-2"></i>HỆ THỐNG TÍNH TOÁN NRW - HUEWACO</h1>
+                <p class="text-blue-200 text-xs mt-0.5">Mô hình 5 Bước Hoàn chỉnh: Hiệu chỉnh P 24h - Q Nền IWA - Bóc tách Nước Đêm & Điểm Rò Rỉ - Bảng IWA & Biểu đồ</p>
             </div>
-            <span class="text-xs bg-blue-800 border border-blue-700 px-3 py-1 rounded-full text-blue-200">Phiên bản 5.0 Hoàn chỉnh</span>
+            <div class="flex items-center space-x-2">
+                <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center transition shadow-sm">
+                    <i class="fa-solid fa-print mr-1.5"></i> In Báo Cáo
+                </button>
+                <span class="text-xs bg-blue-800 border border-blue-700 px-2.5 py-1 rounded text-blue-200">Phiên bản 6.0 Final</span>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         <!-- ========================================================================= -->
         <!-- BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH ÁP LỰC 24H) -->
         <!-- ========================================================================= -->
-        <section class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <div class="bg-blue-800 text-white px-6 py-3.5 flex justify-between items-center">
-                <h2 class="text-base font-bold uppercase flex items-center">
-                    <i class="fa-solid fa-chart-pie text-yellow-400 mr-2.5"></i> BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH ÁP LỰC 24H)
+        <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+            <div class="bg-blue-800 text-white px-5 py-2.5 flex justify-between items-center">
+                <h2 class="text-sm font-bold uppercase flex items-center">
+                    <i class="fa-solid fa-chart-pie text-yellow-400 mr-2"></i> BƯỚC 1: XÁC ĐỊNH TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH ÁP LỰC 24H)
                 </h2>
-                <span class="text-xs bg-blue-700 text-blue-100 px-3 py-0.5 rounded-full">Quét đêm 00h-04h & Cộng dồn 24h</span>
+                <span class="text-xs bg-blue-700 text-blue-100 px-2.5 py-0.5 rounded">Quét đêm 00h-04h & Cộng dồn 24h</span>
             </div>
 
-            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <div class="lg:col-span-7 space-y-4">
+                <!-- BẢNG DỮ LIỆU ĐO ĐẠC NHU CẦU 24H DẠNG EXCEL CHÂN PHƯƠNG -->
+                <div class="lg:col-span-7 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Bảng đo đạc 24h & Q rò rỉ. thô từng giờ</h3>
+                        <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-table text-blue-600 mr-1.5"></i>Bảng dữ liệu nhu cầu 24h & Q rò rỉ thô từng giờ</h3>
                         
-                        <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center transition">
+                        <button onclick="openPatternModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1 rounded shadow-sm flex items-center transition no-print">
                             <i class="fa-solid fa-table-cells mr-1.5"></i> Quản lý Pattern 24h & Import Excel
                         </button>
                     </div>
 
-                    <div class="max-h-[360px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
-                        <table class="w-full text-xs text-left">
-                            <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
+                    <!-- KHOANG BẢNG EXCEL MỎNG NHẸ KHÔNG RỐI MẮT -->
+                    <div class="max-h-[380px] overflow-y-auto border border-slate-300 bg-white">
+                        <table class="excel-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-2 py-2 border text-center">Thời gian</th>
-                                    <th class="px-2 py-2 border text-center">Lưu lượng (m3/h)</th>
-                                    <th class="px-2 py-2 border text-center">Áp lực (m)</th>
-                                    <th class="px-2 py-2 border text-center bg-red-100 text-red-800">Q rò rỉ. thô (m3/h)</th>
+                                    <th style="width: 25%;">Thời gian</th>
+                                    <th style="width: 25%;">Lưu lượng (m3/h)</th>
+                                    <th style="width: 25%;">Áp lực (m)</th>
+                                    <th style="width: 25%;" class="bg-red-50 text-red-900">Q rò rỉ. thô (m3/h)</th>
                                 </tr>
                             </thead>
-                            <tbody id="step1_24h_tbody" class="divide-y">
-                                <!-- JS Render 24 dòng -->
+                            <tbody id="step1_24h_tbody">
+                                <!-- JS Render 24 dòng kiểu bảng Excel -->
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="pt-1">
-                        <label class="block font-bold text-xs text-slate-700">Tổng lưu lượng cấp vào vùng trong ngày Q<sub>tổng</sub> [m³/ngđ]:</label>
-                        <input type="text" id="q_tong" value="918,2" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2.5 border rounded-lg font-extrabold text-blue-900 bg-blue-50/50 text-center text-sm">
+                    <div class="pt-1 flex items-center justify-between bg-slate-50 p-2.5 border border-slate-300 rounded">
+                        <label class="font-bold text-xs text-slate-700">Tổng lưu lượng cấp vào vùng Q<sub>tổng</sub> [m³/ngđ]:</label>
+                        <input type="text" id="q_tong" value="918,2" onclick="this.select()" oninput="calculateNRW()" class="w-32 p-1 border border-slate-400 rounded font-extrabold text-blue-900 bg-white text-center text-xs">
                     </div>
 
-                    <button onclick="calculateNRW()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
-                        <i class="fa-solid fa-calculator mr-2"></i> TÍNH TOÁN THẤT THOÁT SƠ BỘ BƯỚC 1
+                    <button onclick="calculateNRW()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded shadow-sm transition text-xs tracking-wide uppercase no-print">
+                        <i class="fa-solid fa-calculator mr-1.5"></i> TÍNH TOÁN THẤT THOÁT SƠ BỘ BƯỚC 1
                     </button>
                 </div>
 
-                <div class="lg:col-span-5 space-y-4">
-                    <h3 class="font-bold text-slate-700 text-sm border-b pb-2"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-2"></i>Kết quả Thất thoát Sơ bộ Ban đầu</h3>
+                <!-- KẾT QUẢ BƯỚC 1 -->
+                <div class="lg:col-span-5 space-y-3">
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-1.5"></i>Kết quả Thất thoát Sơ bộ</h3>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-                        <div class="bg-red-50 p-3.5 rounded-xl border border-red-200 text-center">
-                            <p class="text-xs text-red-600 font-semibold">TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH P)</p>
-                            <p class="text-3xl font-extrabold text-red-700 mt-1" id="res_raw_percent">-- %</p>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <div class="bg-red-50/70 p-3 rounded border border-red-200 text-center">
+                            <p class="text-xs text-red-700 font-semibold uppercase">TỶ LỆ THẤT THOÁT SƠ BỘ (HIỆU CHỈNH P)</p>
+                            <p class="text-3xl font-extrabold text-red-700 mt-0.5" id="res_raw_percent">-- %</p>
                             <span class="sub-text text-red-600">Q<sub>NRW thô cả ngày</sub> / Q<sub>tổng</sub></span>
                         </div>
-                        <div class="bg-red-50 p-3.5 rounded-xl border border-red-200 text-center">
-                            <p class="text-xs text-red-600 font-semibold">TỔNG Q THẤT THOÁT THÔ (CỘNG DỒN 24H)</p>
-                            <p class="text-2xl font-extrabold text-red-700 mt-1" id="res_raw_q_day">-- m³/ngđ</p>
+                        <div class="bg-red-50/70 p-3 rounded border border-red-200 text-center">
+                            <p class="text-xs text-red-700 font-semibold uppercase">TỔNG Q THẤT THOÁT THÔ (CỘNG DỒN 24H)</p>
+                            <p class="text-2xl font-extrabold text-red-700 mt-0.5" id="res_raw_q_day">-- m³/ngđ</p>
                             <span class="sub-text text-red-600">Tổng 24 giờ Q rò rỉ. thô đã hiệu chỉnh theo Áp lực (m)</span>
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-2">
+                    <div class="bg-slate-50 p-3 rounded border border-slate-300 text-xs space-y-1.5">
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600 font-medium">Q<sub>MNF</sub> thấp nhất đêm (0h-4h):</span>
-                            <span class="font-extrabold text-blue-800 text-sm" id="res_q_mnf">-- m³/h</span>
+                            <span class="font-extrabold text-blue-800" id="res_q_mnf">-- m³/h</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600 font-medium">Khung giờ xảy ra Q<sub>MNF</sub>:</span>
                             <span class="font-bold text-slate-800" id="res_mnf_time">--</span>
                         </div>
-                        <div class="flex justify-between items-center border-t pt-1.5">
+                        <div class="flex justify-between items-center border-t border-slate-200 pt-1.5">
                             <span class="text-slate-600 font-medium">Áp lực đêm tương ứng (P<sub>đêm</sub>):</span>
                             <span class="font-bold text-slate-800" id="res_p_dem">-- m</span>
                         </div>
@@ -131,77 +169,70 @@
         <!-- ========================================================================= -->
         <!-- BƯỚC 2: PHẦN TÍNH GIÁ TRỊ Q NỀN (CÔNG THỨC IWA - HỆ SỐ N TỦY CHỈNH) -->
         <!-- ========================================================================= -->
-        <section class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <div class="bg-emerald-800 text-white px-6 py-3.5 flex justify-between items-center">
-                <h2 class="text-base font-bold uppercase flex items-center">
-                    <i class="fa-solid fa-network-wired text-yellow-400 mr-2.5"></i> BƯỚC 2: TÍNH GIÁ TRỊ THẤT THOÁT NỀN (Q NỀN IWA)
+        <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+            <div class="bg-emerald-800 text-white px-5 py-2.5 flex justify-between items-center">
+                <h2 class="text-sm font-bold uppercase flex items-center">
+                    <i class="fa-solid fa-network-wired text-yellow-400 mr-2"></i> BƯỚC 2: TÍNH GIÁ TRỊ THẤT THOÁT NỀN (Q NỀN IWA)
                 </h2>
-                <span class="text-xs bg-emerald-700 text-emerald-100 px-3 py-0.5 rounded-full">Bóc tách UBL theo Tiêu chuẩn IWA</span>
+                <span class="text-xs bg-emerald-700 text-emerald-100 px-2.5 py-0.5 rounded">Bóc tách UBL theo Tiêu chuẩn IWA</span>
             </div>
 
-            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <div class="lg:col-span-6 space-y-4">
-                    <h3 class="font-bold text-emerald-800 text-sm border-b pb-2"><i class="fa-solid fa-sliders text-emerald-600 mr-2"></i>Thông số Hạ tầng DMA & Hệ số Thủy lực</h3>
+                <div class="lg:col-span-6 space-y-3">
+                    <h3 class="font-bold text-emerald-800 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-sliders text-emerald-600 mr-1.5"></i>Thông số Hạ tầng DMA & Hệ số Thủy lực</h3>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2.5 text-xs">
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống chính L<sub>m</sub> [m]:</label>
-                            <input type="text" id="l_m" value="5.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="l_m" value="5.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1.5 border border-slate-300 rounded font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Chiều dài ống nhánh L<sub>p</sub> [m]:</label>
-                            <input type="text" id="l_p" value="2.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="l_p" value="2.000" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1.5 border border-slate-300 rounded font-bold text-center">
                         </div>
                         <div>
                             <label class="font-semibold text-slate-700">Số đấu nối N<sub>c</sub> [hộ]:</label>
-                            <input type="text" id="n_c" value="400" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border rounded-lg font-bold text-center">
+                            <input type="text" id="n_c" value="400" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1.5 border border-slate-300 rounded font-bold text-center">
                         </div>
-
                         <div>
                             <label class="font-bold text-blue-900">Hệ số mũ áp lực (N):</label>
-                            <input type="text" id="n_exponent" value="1,5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border-2 border-emerald-500 rounded-lg font-extrabold text-center text-blue-900 bg-yellow-50">
+                            <input type="text" id="n_exponent" value="1,5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-1.5 border-2 border-emerald-500 rounded font-extrabold text-center text-blue-900 bg-yellow-50">
                         </div>
                     </div>
 
-                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-xs text-amber-900 space-y-1.5 shadow-sm">
-                        <p class="font-bold text-amber-950 flex items-center">
-                            <i class="fa-solid fa-lightbulb text-amber-600 mr-1.5 text-sm"></i> HƯỚNG DẪN CHỌN HỆ SỐ MŨ ÁP LỰC (N):
-                        </p>
-                        <ul class="list-disc list-inside space-y-1 text-[0.72rem] text-slate-700 leading-relaxed">
-                            <li><b>N = 1,5 (Khuyên dùng HueWACO):</b> DMA cũ có &gt;90% ống nhựa (HDPE, uPVC). <i>Vết vỡ co giãn mạnh theo áp lực ban đêm.</i></li>
-                            <li><b>N = 1,0:</b> DMA hỗn hợp (tỷ lệ ống Kim loại và ống Nhựa tương đương nhau).</li>
-                            <li><b>N = 0,5:</b> DMA đa số ống Kim loại (Gang, Thép) hoặc mô phỏng lỗ xì vỡ bục lớn.</li>
-                        </ul>
+                    <div class="bg-amber-50 p-2.5 rounded border border-amber-200 text-xs text-amber-900 space-y-1">
+                        <p class="font-bold text-amber-950 text-[0.72rem]"><i class="fa-solid fa-lightbulb mr-1"></i> Chú giải chọn Hệ số mũ Áp lực N:</p>
+                        <p class="text-[0.7rem] text-slate-700"><b>N = 1,5 (Khuyên dùng HueWACO):</b> Mạng ống nhựa HDPE (>90%). | <b>N = 1,0:</b> Mạng hỗn hợp. | <b>N = 0,5:</b> Mạng đa số ống kim loại.</p>
                     </div>
 
-                    <button onclick="calculateNRW()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition text-xs tracking-wide uppercase">
-                        <i class="fa-solid fa-calculator mr-2"></i> TÍNH TOÁN THẤT THOÁT NỀN BƯỚC 2
+                    <button onclick="calculateNRW()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded shadow-sm transition text-xs tracking-wide uppercase no-print">
+                        <i class="fa-solid fa-calculator mr-1.5"></i> TÍNH TOÁN THẤT THOÁT NỀN BƯỚC 2
                     </button>
                 </div>
 
-                <div class="lg:col-span-6 space-y-4">
-                    <h3 class="font-bold text-slate-700 text-sm border-b pb-2"><i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i>Kết quả Bóc tách Thất thoát Nền</h3>
+                <div class="lg:col-span-6 space-y-3">
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-chart-line text-emerald-600 mr-1.5"></i>Kết quả Bóc tách Thất thoát Nền</h3>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center">
-                            <p class="text-xs text-blue-600 font-semibold">Q NỀN CHO PHẾP CẢ NGÀY</p>
-                            <p class="text-2xl font-extrabold text-blue-800 mt-1" id="res_q_n_day">-- m³/ngđ</p>
-                            <span class="sub-text text-blue-600">Q<sub>n giờ</sub>: <span id="res_q_n_hour">--</span> m³/h (Đã hiệu chỉnh P<sub>TB</sub>)</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50/70 p-3 rounded border border-blue-200 text-center">
+                            <p class="text-[0.7rem] text-blue-700 font-semibold uppercase">Q NỀN CHO PHẾP CẢ NGÀY</p>
+                            <p class="text-2xl font-extrabold text-blue-800 mt-0.5" id="res_q_n_day">-- m³/ngđ</p>
+                            <span class="sub-text text-blue-600">Q<sub>n giờ</sub>: <span id="res_q_n_hour">--</span> m³/h</span>
                         </div>
-                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-center">
-                            <p class="text-xs text-emerald-700 font-semibold">Q NỀN ĐƠN VỊ CẢ VÙNG</p>
-                            <p class="text-2xl font-extrabold text-emerald-800 mt-1" id="res_q_n_unit">--</p>
+                        <div class="bg-emerald-50/70 p-3 rounded border border-emerald-200 text-center">
+                            <p class="text-[0.7rem] text-emerald-700 font-semibold uppercase">Q NỀN ĐƠN VỊ CẢ VÙNG</p>
+                            <p class="text-2xl font-extrabold text-emerald-800 mt-0.5" id="res_q_n_unit">--</p>
                             <span class="sub-text text-emerald-700">lít / hộ / giờ</span>
                         </div>
                     </div>
 
-                    <div class="bg-yellow-50 p-4 rounded-xl border-2 border-yellow-400 space-y-2">
+                    <div class="bg-yellow-50 p-3 rounded border border-yellow-300 space-y-1.5">
                         <div class="flex justify-between items-center text-xs font-bold text-yellow-900">
                             <span>Q THẤT THOÁT TÍNH TOÁN (TẠM TÍNH):</span>
-                            <span class="text-base text-red-600 font-extrabold" id="res_q_loss_temp">-- m³/ngđ</span>
+                            <span class="text-sm text-red-600 font-extrabold" id="res_q_loss_temp">-- m³/ngđ</span>
                         </div>
-                        <p class="text-[0.72rem] text-slate-600 font-mono bg-white p-2 rounded border border-yellow-300" id="step2_formula_detail">
+                        <p class="text-[0.7rem] text-slate-600 font-mono bg-white p-1.5 rounded border border-yellow-200" id="step2_formula_detail">
                             Phép tính: Q Thất thoát = Q rò rỉ. thô (24h) - Q nền (24h) = 0,0 - 0,0 = 0,0 m³/ngđ
                         </p>
                     </div>
@@ -214,84 +245,78 @@
         <!-- ========================================================================= -->
         <!-- BƯỚC 3: XÁC ĐỊNH LƯỢNG NƯỚC RÒ RỈ THỰC SỰ & KHÁCH HÀNG DÙNG ĐÊM -->
         <!-- ========================================================================= -->
-        <section class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <div class="bg-purple-900 text-white px-6 py-3.5 flex justify-between items-center">
-                <h2 class="text-base font-bold uppercase flex items-center">
-                    <i class="fa-solid fa-pipe-collar text-yellow-400 mr-2.5"></i> BƯỚC 3: XÁC ĐỊNH RÒ RỈ THỰC SỰ & KHÁCH HÀNG DÙNG ĐÊM
+        <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+            <div class="bg-purple-900 text-white px-5 py-2.5 flex justify-between items-center">
+                <h2 class="text-sm font-bold uppercase flex items-center">
+                    <i class="fa-solid fa-pipe-collar text-yellow-400 mr-2"></i> BƯỚC 3: XÁC ĐỊNH RÒ RỈ THỰC SỰ & KHÁCH HÀNG DÙNG ĐÊM
                 </h2>
-                <span class="text-xs bg-purple-800 text-purple-100 px-3 py-0.5 rounded-full">Bóc tách điểm rò rỉ & Dùng đêm</span>
+                <span class="text-xs bg-purple-800 text-purple-100 px-2.5 py-0.5 rounded">Bóc tách điểm rò rỉ & Dùng đêm</span>
             </div>
 
-            <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <!-- CỘT BÊN TRÁI: NHẬP KHÁCH HÀNG DÙNG ĐÊM & QUẢN LÝ ĐIỂM RÒ RỈ -->
-                <div class="lg:col-span-7 space-y-5">
-                    
-                    <!-- Khối 1: Tiêu thụ ban đêm của Khách hàng -->
-                    <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-200 space-y-3">
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="bg-purple-50/50 p-3 rounded border border-purple-200 space-y-2">
                         <h3 class="font-bold text-purple-900 text-xs uppercase flex items-center justify-between">
-                            <span><i class="fa-solid fa-users text-purple-700 mr-1.5"></i> 1. Nhu cầu nước đêm của Khách hàng</span>
+                            <span><i class="fa-solid fa-users text-purple-700 mr-1.5"></i> Nhu cầu nước đêm của Khách hàng</span>
                             <span class="text-[0.68rem] text-purple-700 font-semibold">(Tự động trừ khỏi Q_MNF)</span>
                         </h3>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700">Lưu lượng khách hàng tiêu thụ ban đêm Q<sub>khách hàng đêm</sub> [m³/h]:</label>
-                            <input type="text" id="q_customer_night" value="1,5" onclick="this.select()" oninput="calculateNRW()" class="mt-1 w-full p-2 border border-purple-300 rounded-lg font-bold text-center text-purple-900 bg-white">
+                        <div class="flex items-center space-x-3">
+                            <label class="text-xs font-semibold text-slate-700 whitespace-nowrap">Lưu lượng khách hàng tiêu thụ đêm Q<sub>KH đêm</sub> [m³/h]:</label>
+                            <input type="text" id="q_customer_night" value="1,5" onclick="this.select()" oninput="calculateNRW()" class="w-32 p-1 border border-purple-300 rounded font-bold text-center text-purple-900 bg-white text-xs">
                         </div>
                     </div>
 
-                    <!-- Khối 2: Bảng Quản lý Danh sách Điểm Rò Rỉ -->
-                    <div class="space-y-3 border-t pt-3">
+                    <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-locating text-red-600 mr-1.5"></i> 2. Danh sách các Điểm Rò Rỉ Đã Phát Hiện</h3>
-                            <button onclick="openLeakModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow flex items-center transition">
+                            <h3 class="font-bold text-slate-700 text-xs uppercase"><i class="fa-solid fa-location-dot text-red-600 mr-1.5"></i> Danh sách các Điểm Rò Rỉ Đã Phát Hiện</h3>
+                            <button onclick="openLeakModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-2.5 py-1 rounded shadow-sm flex items-center transition no-print">
                                 <i class="fa-solid fa-plus mr-1"></i> Thêm Điểm Rò Rỉ
                             </button>
                         </div>
 
-                        <div class="max-h-[240px] overflow-y-auto border rounded-xl bg-slate-50 p-2">
-                            <table class="w-full text-xs text-left">
-                                <thead class="bg-slate-200 text-slate-700 font-bold sticky top-0">
+                        <div class="max-h-[200px] overflow-y-auto border border-slate-300 bg-white">
+                            <table class="excel-table">
+                                <thead>
                                     <tr>
-                                        <th class="px-2 py-2 border">Tên điểm</th>
-                                        <th class="px-2 py-2 border">Địa chỉ</th>
-                                        <th class="px-2 py-2 border">Nguyên nhân</th>
-                                        <th class="px-2 py-2 border text-center">L/phút</th>
-                                        <th class="px-2 py-2 border text-center">m³/h</th>
-                                        <th class="px-2 py-2 border text-center">Thao tác</th>
+                                        <th>Tên điểm</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Nguyên nhân</th>
+                                        <th class="text-center">L/phút</th>
+                                        <th class="text-center">m³/h</th>
+                                        <th class="text-center no-print">Thao tác</th>
                                     </tr>
                                 </thead>
-                                <tbody id="leak_list_tbody" class="divide-y">
-                                    <!-- JS Render danh sách điểm rò rỉ -->
+                                <tbody id="leak_list_tbody">
+                                    <!-- JS Render điểm rò rỉ kiểu Excel -->
                                 </tbody>
                             </table>
                         </div>
 
-                        <div class="bg-red-50 p-2.5 rounded-lg border border-red-200 text-xs flex justify-between items-center font-bold text-red-900">
+                        <div class="bg-red-50 p-2 rounded border border-red-200 text-xs flex justify-between items-center font-bold text-red-900">
                             <span>TỔNG LƯỢNG RÒ RỈ CÁC ĐIỂM:</span>
-                            <span class="text-sm" id="res_total_leak_points">0,00 m³/h (0 L/phút)</span>
+                            <span id="res_total_leak_points">0,00 m³/h (0 L/phút)</span>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- CỘT BÊN PHẢI: KẾT QUẢ RÒ RỈ VỠ ỐNG THỰC SỰ BƯỚC 3 -->
-                <div class="lg:col-span-5 space-y-4">
-                    <h3 class="font-bold text-slate-700 text-sm border-b pb-2"><i class="fa-solid fa-bullseye text-purple-700 mr-2"></i>Kết quả Cân bằng Thất thoát Thực sự</h3>
+                <div class="lg:col-span-5 space-y-3">
+                    <h3 class="font-bold text-slate-700 text-xs border-b pb-2 uppercase"><i class="fa-solid fa-bullseye text-purple-700 mr-1.5"></i>Kết quả Cân bằng Rò rỉ Vỡ ống</h3>
 
-                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 text-center space-y-1">
-                        <p class="text-xs text-purple-800 font-semibold">Q RÒ RỈ VỠ ỐNG ĐÊM THỰC SỰ</p>
-                        <p class="text-3xl font-extrabold text-purple-900" id="res_q_burst_night">-- m³/h</p>
+                    <div class="bg-purple-50/70 p-3 rounded border border-purple-200 text-center space-y-0.5">
+                        <p class="text-[0.7rem] text-purple-800 font-semibold uppercase">Q RÒ RỈ VỠ ỐNG ĐÊM THỰC SỰ</p>
+                        <p class="text-2xl font-extrabold text-purple-900" id="res_q_burst_night">-- m³/h</p>
                         <span class="sub-text text-purple-700">Q<sub>MNF</sub> - Q<sub>n</sub> - Q<sub>KH đêm</sub> - Q<sub>điểm rò rỉ</sub></span>
                     </div>
 
-                    <div class="bg-red-50 p-4 rounded-xl border-2 border-red-400 text-center space-y-1 shadow-sm">
-                        <p class="text-xs text-red-600 font-bold uppercase">TỔNG LƯỢNG RÒ RỈ VỠ ỐNG THỰC SỰ CẢ NGÀY</p>
-                        <p class="text-3xl font-extrabold text-red-700" id="res_q_burst_day">-- m³/ngđ</p>
+                    <div class="bg-red-50/80 p-3 rounded border border-red-300 text-center space-y-0.5 shadow-sm">
+                        <p class="text-xs text-red-700 font-bold uppercase">TỔNG LƯỢNG RÒ RỈ VỠ ỐNG THỰC SỰ CẢ NGÀY</p>
+                        <p class="text-2xl font-extrabold text-red-700" id="res_q_burst_day">-- m³/ngđ</p>
                         <span class="sub-text text-red-600">Quy đổi 24h theo biến động áp lực (N = <span id="res_burst_n_val">1,5</span>)</span>
                     </div>
 
-                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-2">
-                        <p class="font-bold text-slate-700 border-b pb-1">Bảng cân bằng thủy lực ban đêm (m³/h):</p>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-300 text-xs space-y-1.5">
+                        <p class="font-bold text-slate-700 border-b border-slate-200 pb-1">Cân bằng thủy lực ban đêm (m³/h):</p>
                         <div class="flex justify-between text-slate-600">
                             <span>1. Tổng Q_MNF ban đêm:</span>
                             <span class="font-bold text-blue-800" id="b3_q_mnf">-- m³/h</span>
@@ -305,7 +330,7 @@
                             <span class="font-bold text-purple-800" id="b3_q_cust">-- m³/h</span>
                         </div>
                         <div class="flex justify-between text-slate-600">
-                            <span>4. Trừ Các Điểm Rò Rỉ đã phát hiện:</span>
+                            <span>4. Trừ Các Điểm Rò Rỉ phát hiện:</span>
                             <span class="font-bold text-red-700" id="b3_q_leak_pts">-- m³/h</span>
                         </div>
                     </div>
@@ -314,117 +339,134 @@
             </div>
         </section>
 
+
+        <!-- ========================================================================= -->
+        <!-- BƯỚC 4: BẢNG CÂN BẰNG NƯỚC IWA TIÊU CHUẨN (WATER BALANCE TABLE) -->
+        <!-- ========================================================================= -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+            <div class="bg-slate-800 text-white px-5 py-2.5 flex justify-between items-center">
+                <h2 class="text-sm font-bold uppercase flex items-center">
+                    <i class="fa-solid fa-table-list text-yellow-400 mr-2"></i> BƯỚC 4: BẢNG CÂN BẰNG NƯỚC TIÊU CHUẨN IWA (WATER BALANCE)
+                </h2>
+                <span class="text-xs bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded">Khung chuẩn Quốc tế IWA</span>
+            </div>
+
+            <div class="p-5">
+                <div class="overflow-x-auto border border-slate-300 bg-white">
+                    <table class="excel-table text-center">
+                        <thead>
+                            <tr>
+                                <th rowspan="4" class="w-1/4 bg-slate-200">TỔNG LƯỢNG NƯỚC CẤP ĐẦU VÀO (SIV)<br><span class="text-blue-900 font-extrabold text-sm" id="iwa_siv">-- m³/ngđ</span></th>
+                                <td colspan="2" class="bg-emerald-100 font-bold">NƯỚC TIÊU THỤ CÓ PHÉP<br><span id="iwa_auth_cons">-- m³/ngđ</span></td>
+                                <td colspan="2" class="bg-blue-50 font-bold">Lượng nước thương mại / Doanh thu</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3" class="bg-red-100 font-bold">TẤT THOÁT NƯỚC (NRW)<br><span class="text-red-700 font-extrabold text-sm" id="iwa_nrw_total">-- m³/ngđ</span></td>
+                                <td class="bg-amber-100 font-bold">Thất thoát Thương mại (Apparent Losses)</td>
+                                <td class="bg-amber-50">Thất thoát do đồng hồ / Gian lận nước</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2" class="bg-red-200 font-bold">THẤT THOÁT THỰC SỰ (REAL LOSSES)<br><span class="text-red-900 font-extrabold" id="iwa_real_losses">-- m³/ngđ</span></td>
+                                <td class="bg-red-50 text-left px-3">1. Rò rỉ nền cho phép (UBL): <b class="float-right text-emerald-800" id="iwa_ubl">-- m³/ngđ</b></td>
+                            </tr>
+                            <tr>
+                                <td class="bg-red-50 text-left px-3">2. Rò rỉ vỡ ống thực sự (Bursts): <b class="float-right text-red-700" id="iwa_bursts">-- m³/ngđ</b></td>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================================= -->
+        <!-- BƯỚC 5: BIỂU ĐỒ ĐƯỜNG CONG THỦY LỰC 24 GIỜ (PATTERN GRAPHIC) -->
+        <!-- ========================================================================= -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden no-print">
+            <div class="bg-teal-900 text-white px-5 py-2.5 flex justify-between items-center">
+                <h2 class="text-sm font-bold uppercase flex items-center">
+                    <i class="fa-solid fa-chart-line text-yellow-400 mr-2"></i> BƯỚC 5: BIỂU ĐỒ ĐƯỜNG CONG LƯU LƯỢNG & ÁP LỰC 24 GIỜ
+                </h2>
+                <span class="text-xs bg-teal-800 text-teal-100 px-2.5 py-0.5 rounded">Trực quan hóa Pattern thủy lực</span>
+            </div>
+
+            <div class="p-5">
+                <div class="h-72 w-full bg-slate-50 p-2 rounded border border-slate-300">
+                    <canvas id="patternChart"></canvas>
+                </div>
+            </div>
+        </section>
+
     </main>
 
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: BẢNG PATTERN 24H & IMPORT EXCEL -->
-    <!-- ========================================================================= -->
-    <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-            
-            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
-                <div>
-                    <h3 class="text-base font-bold flex items-center">
-                        <i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ CÁC PATTERN MẪU 24 GIỜ & IMPORT EXCEL
-                    </h3>
-                    <p class="text-xs text-blue-200 mt-0.5">Chọn Pattern để áp dụng hoặc Import file Excel/CSV trực tiếp cho Pattern đang chọn</p>
-                </div>
-                <button onclick="closePatternModal()" class="text-slate-300 hover:text-white text-xl font-bold p-1">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- MODAL PATTERN & IMPORT EXCEL -->
+    <div id="patternModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden border border-slate-300 flex flex-col">
+            <div class="bg-blue-900 text-white px-5 py-3 flex justify-between items-center">
+                <h3 class="text-sm font-bold flex items-center"><i class="fa-solid fa-clock mr-2 text-yellow-400"></i> QUẢN LÝ PATTERN 24H & IMPORT EXCEL</h3>
+                <button onclick="closePatternModal()" class="text-slate-300 hover:text-white text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <div class="p-6 overflow-y-auto space-y-6">
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                    <label class="block text-xs font-bold text-slate-700 uppercase">1. Chọn Pattern muốn thao tác / kích hoạt:</label>
-                    <div class="grid grid-cols-5 gap-2" id="pattern_selector_container">
-                        <!-- JS Render 5 Pattern Buttons -->
-                    </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">1. Chọn Pattern muốn kích hoạt:</label>
+                    <div class="grid grid-cols-5 gap-2" id="pattern_selector_container"></div>
                 </div>
-
-                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex items-center justify-between">
+                <div class="bg-emerald-50 p-3 rounded border border-emerald-200 flex items-center justify-between">
                     <div>
-                        <h4 class="text-xs font-bold text-emerald-900 uppercase"><i class="fa-solid fa-file-excel mr-1.5"></i>2. Nạp dữ liệu Excel cho <span id="current_editing_pat_label" class="text-blue-800 font-extrabold">Pattern 1</span>:</h4>
-                        <p class="text-[0.72rem] text-slate-600 mt-0.5">Tệp file Excel (.xlsx, .csv) chứa 24 dòng gồm các cột Lưu lượng (m3/h) và Áp lực (m).</p>
+                        <h4 class="text-xs font-bold text-emerald-900 uppercase">2. Import Excel cho <span id="current_editing_pat_label" class="text-blue-800 font-extrabold">Pattern 1</span>:</h4>
+                        <p class="text-[0.7rem] text-slate-600 mt-0.5">File Excel/CSV chứa 24 dòng gồm các cột Lưu lượng (m3/h) và Áp lực (m).</p>
                     </div>
-
-                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg cursor-pointer shadow flex items-center transition">
-                        <i class="fa-solid fa-upload mr-2"></i> Import File Excel
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded cursor-pointer shadow-sm flex items-center transition">
+                        <i class="fa-solid fa-upload mr-1.5"></i> Import File Excel
                         <input type="file" id="excel_file_input" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcelDataForPattern(event)">
                     </label>
                 </div>
             </div>
-
-            <div class="bg-slate-100 px-6 py-3.5 border-t flex justify-end space-x-3">
-                <button onclick="closePatternModal()" class="px-5 py-2 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded-lg transition">
-                    Đóng
-                </button>
-                <button onclick="closePatternModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
-                    <i class="fa-solid fa-check mr-2"></i> Áp Dụng & Hoàn Tất
-                </button>
+            <div class="bg-slate-100 px-5 py-3 border-t flex justify-end space-x-2">
+                <button onclick="closePatternModal()" class="px-4 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded transition">Đóng</button>
             </div>
-
         </div>
     </div>
 
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: THÊM / SỬA ĐIỂM RÒ RỈ -->
-    <!-- ========================================================================= -->
-    <div id="leakModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
-            
-            <div class="bg-red-800 text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="text-base font-bold flex items-center" id="leak_modal_title">
-                    <i class="fa-solid fa-triangle-exclamation mr-2 text-yellow-400"></i> THÊM ĐIỂM RÒ RỈ MỚI
-                </h3>
-                <button onclick="closeLeakModal()" class="text-slate-300 hover:text-white text-xl font-bold p-1">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- MODAL THÊM / SỬA ĐIỂM RÒ RỈ -->
+    <div id="leakModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-slate-300 flex flex-col">
+            <div class="bg-red-800 text-white px-5 py-3 flex justify-between items-center">
+                <h3 class="text-sm font-bold flex items-center" id="leak_modal_title"><i class="fa-solid fa-triangle-exclamation mr-2 text-yellow-400"></i> THÊM ĐIỂM RÒ RỈ MỚI</h3>
+                <button onclick="closeLeakModal()" class="text-slate-300 hover:text-white text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <div class="p-6 space-y-4 text-xs">
+            <div class="p-5 space-y-3 text-xs">
                 <input type="hidden" id="leak_edit_index" value="-1">
-
                 <div>
                     <label class="block font-bold text-slate-700">Tên điểm rò rỉ (*):</label>
-                    <input type="text" id="leak_name" placeholder="VD: Bể đai khởi thủy D110" class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                    <input type="text" id="leak_name" placeholder="VD: Điểm xì đai D110" class="mt-1 w-full p-1.5 border border-slate-300 rounded">
                 </div>
-
                 <div>
                     <label class="block font-bold text-slate-700">Địa chỉ / Vị trí:</label>
-                    <input type="text" id="leak_address" placeholder="VD: Trước nhà 45 Lý Thường Kiệt" class="mt-1 w-full p-2 border rounded-lg">
+                    <input type="text" id="leak_address" placeholder="VD: 45 Lý Thường Kiệt" class="mt-1 w-full p-1.5 border border-slate-300 rounded">
                 </div>
-
                 <div>
                     <label class="block font-bold text-slate-700">Nguyên nhân rò rỉ:</label>
-                    <input type="text" id="leak_reason" placeholder="VD: Bụt đai, vỡ ống nhánh HDPE" class="mt-1 w-full p-2 border rounded-lg">
+                    <input type="text" id="leak_reason" placeholder="VD: Bụt đai khởi thủy" class="mt-1 w-full p-1.5 border border-slate-300 rounded">
                 </div>
-
                 <div>
-                    <label class="block font-bold text-red-700">Lượng nước thất thoát đo đạc (L/phút) (*):</label>
-                    <input type="text" id="leak_lpm" placeholder="VD: 25,5" onclick="this.select()" class="mt-1 w-full p-2 border border-red-400 rounded-lg font-extrabold text-red-900 text-center bg-red-50">
-                    <span class="sub-text text-slate-500">Chương trình tự động đổi ra m³/h = (L/phút × 60) / 1000</span>
+                    <label class="block font-bold text-red-700">Lượng nước thất thoát (L/phút) (*):</label>
+                    <input type="text" id="leak_lpm" placeholder="VD: 25,5" onclick="this.select()" class="mt-1 w-full p-1.5 border border-red-400 rounded font-bold text-red-900 text-center bg-red-50">
+                    <span class="sub-text">Tự động đổi ra m³/h = (L/phút × 60) / 1000</span>
                 </div>
             </div>
-
-            <div class="bg-slate-100 px-6 py-3.5 border-t flex justify-end space-x-3">
-                <button onclick="closeLeakModal()" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded-lg transition">
-                    Hủy
-                </button>
-                <button onclick="saveLeakPoint()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center">
-                    <i class="fa-solid fa-floppy-disk mr-2"></i> Lưu Điểm Rò Rỉ
-                </button>
+            <div class="bg-slate-100 px-5 py-3 border-t flex justify-end space-x-2">
+                <button onclick="closeLeakModal()" class="px-4 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold text-xs rounded transition">Hủy</button>
+                <button onclick="saveLeakPoint()" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded shadow-sm transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu Điểm Rò Rỉ</button>
             </div>
-
         </div>
     </div>
 
 
-    <!-- JAVASCRIPT XỬ LÝ TOÀN BỘ CHƯƠNG TRÌNH -->
+    <!-- JAVASCRIPT XỬ LÝ TOÀN BỘ CHƯƠNG TRÌNH & BIỂU ĐỒ CHART.JS -->
     <script>
-        // HÀM CHUYỂN ĐỔI CHUỖI CÓ DẤU PHẨY THÀNH SỐ
         function parseVietnameseNumber(val) {
             if (val === null || val === undefined) return 0;
             if (typeof val === 'number') return val;
@@ -435,13 +477,11 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // HÀM ĐỊNH DẠNG SỐ XUẤT RA DẤU PHẨY THẬP PHÂN
         function formatVietnameseNumber(num, decimals = 2) {
             if (isNaN(num)) return "0";
             return num.toFixed(decimals).replace('.', ',');
         }
 
-        // Store lưu các Pattern
         let patternsStore = {
             1: [
                 { time: "00h - 01h", q: 12.5, p: 23.5, isNight: true },
@@ -476,35 +516,34 @@
         }
 
         let activePattern = 1;
-
-        // Store lưu Danh sách Điểm Rò Rỉ Bước 3
         let leakPointsStore = [
             { name: "Điểm xì đai D110", address: "45 Lý Thường Kiệt", reason: "Bụt đai khởi thủy", lpm: 20.0 }
         ];
+        let myChart = null;
 
-        // Render Bảng 24h
+        // Render bảng dữ liệu Excel chân phương
         function render24hTable() {
             const tbody = document.getElementById('step1_24h_tbody');
             tbody.innerHTML = '';
             const currentData = patternsStore[activePattern];
 
             currentData.forEach((item, index) => {
-                const bgHighlight = item.isNight ? 'bg-yellow-50/70 font-semibold' : 'bg-white';
+                const bgHighlight = item.isNight ? 'bg-yellow-50/80 font-semibold' : 'bg-white';
                 const tagNight = item.isNight ? ' <span class="text-[0.65rem] bg-yellow-200 text-yellow-800 px-1 rounded font-bold">Đêm</span>' : '';
 
                 const qStr = formatVietnameseNumber(item.q, 1);
                 const pStr = formatVietnameseNumber(item.p, 1);
 
                 const row = `
-                    <tr class="${bgHighlight} border-b hover:bg-slate-100">
-                        <td class="px-2 py-1 border text-center font-medium">${item.time}${tagNight}</td>
-                        <td class="px-1 py-1 border">
-                            <input type="text" id="q_${index}" value="${qStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-blue-900 font-bold">
+                    <tr class="${bgHighlight}">
+                        <td class="text-center font-medium">${item.time}${tagNight}</td>
+                        <td class="p-0 border border-slate-300">
+                            <input type="text" id="q_${index}" value="${qStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="excel-input text-blue-900 font-bold p-1">
                         </td>
-                        <td class="px-1 py-1 border">
-                            <input type="text" id="p_${index}" value="${pStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="w-full text-center p-1 border rounded text-slate-800">
+                        <td class="p-0 border border-slate-300">
+                            <input type="text" id="p_${index}" value="${pStr}" onclick="this.select()" oninput="updateInputValue(${index})" class="excel-input text-slate-800 p-1">
                         </td>
-                        <td class="px-2 py-1 border text-center font-extrabold text-red-700 bg-red-50/50" id="q_tho_${index}">
+                        <td class="text-center font-extrabold text-red-700 bg-red-50/40" id="q_tho_${index}">
                             --
                         </td>
                     </tr>
@@ -521,7 +560,6 @@
             calculateNRW();
         }
 
-        // Render Danh sách Điểm rò rỉ Bước 3
         function renderLeakPointsTable() {
             const tbody = document.getElementById('leak_list_tbody');
             tbody.innerHTML = '';
@@ -534,15 +572,15 @@
                 totalM3h += m3h;
 
                 const row = `
-                    <tr class="bg-white border-b hover:bg-slate-50">
-                        <td class="px-2 py-1.5 border font-bold text-slate-800">${item.name}</td>
-                        <td class="px-2 py-1.5 border text-slate-600">${item.address || '-'}</td>
-                        <td class="px-2 py-1.5 border text-slate-600">${item.reason || '-'}</td>
-                        <td class="px-2 py-1.5 border text-center font-bold text-red-700 bg-red-50/30">${formatVietnameseNumber(item.lpm, 1)}</td>
-                        <td class="px-2 py-1.5 border text-center font-extrabold text-blue-800 bg-blue-50/30">${formatVietnameseNumber(m3h, 3)}</td>
-                        <td class="px-2 py-1.5 border text-center space-x-1">
-                            <button onclick="editLeakPoint(${idx})" class="text-blue-600 hover:text-blue-800 font-bold p-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteLeakPoint(${idx})" class="text-red-600 hover:text-red-800 font-bold p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    <tr class="bg-white">
+                        <td class="font-bold text-slate-800">${item.name}</td>
+                        <td class="text-slate-600">${item.address || '-'}</td>
+                        <td class="text-slate-600">${item.reason || '-'}</td>
+                        <td class="text-center font-bold text-red-700 bg-red-50/30">${formatVietnameseNumber(item.lpm, 1)}</td>
+                        <td class="text-center font-extrabold text-blue-800 bg-blue-50/30">${formatVietnameseNumber(m3h, 3)}</td>
+                        <td class="text-center space-x-1 no-print">
+                            <button onclick="editLeakPoint(${idx})" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteLeakPoint(${idx})" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                 `;
@@ -553,7 +591,6 @@
             return { totalLpm, totalM3h };
         }
 
-        // Quản lý Modal Điểm rò rỉ
         function openLeakModal() {
             document.getElementById('leak_modal_title').innerText = "THÊM ĐIỂM RÒ RỈ MỚI";
             document.getElementById('leak_edit_index').value = "-1";
@@ -583,7 +620,7 @@
         }
 
         function deleteLeakPoint(idx) {
-            if (confirm("Anh có chắc chắn muốn xóa điểm rò rỉ này khỏi danh sách?")) {
+            if (confirm("Xóa điểm rò rỉ này khỏi danh sách?")) {
                 leakPointsStore.splice(idx, 1);
                 renderLeakPointsTable();
                 calculateNRW();
@@ -592,32 +629,22 @@
 
         function saveLeakPoint() {
             const name = document.getElementById('leak_name').value.trim();
-            const lpmStr = document.getElementById('leak_lpm').value;
-            const lpm = parseVietnameseNumber(lpmStr);
+            const lpm = parseVietnameseNumber(document.getElementById('leak_lpm').value);
 
             if (!name) { alert("Vui lòng nhập Tên điểm rò rỉ!"); return; }
-            if (lpm <= 0) { alert("Vui lòng nhập Lượng nước thất thoát (L/phút) lớn hơn 0!"); return; }
+            if (lpm <= 0) { alert("Lượng nước thất thoát phải lớn hơn 0!"); return; }
 
             const editIdx = parseInt(document.getElementById('leak_edit_index').value);
-            const newItem = {
-                name: name,
-                address: document.getElementById('leak_address').value.trim(),
-                reason: document.getElementById('leak_reason').value.trim(),
-                lpm: lpm
-            };
+            const newItem = { name, address: document.getElementById('leak_address').value.trim(), reason: document.getElementById('leak_reason').value.trim(), lpm };
 
-            if (editIdx >= 0) {
-                leakPointsStore[editIdx] = newItem;
-            } else {
-                leakPointsStore.push(newItem);
-            }
+            if (editIdx >= 0) leakPointsStore[editIdx] = newItem;
+            else leakPointsStore.push(newItem);
 
             closeLeakModal();
             renderLeakPointsTable();
             calculateNRW();
         }
 
-        // Import Excel cho Pattern
         function importExcelDataForPattern(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -627,8 +654,7 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
                     let count = 0;
@@ -657,13 +683,13 @@
                     calculateNRW();
                     alert(`Đã Import thành công ${count} khung giờ vào Pattern ${activePattern}!`);
                 } catch (err) {
-                    alert("Lỗi khi đọc file Excel. Vui lòng kiểm tra định dạng!");
+                    alert("Lỗi khi đọc file Excel!");
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // HÀM TÍNH TOÁN TỔNG THỂ BƯỚC 1, 2 VÀ 3
+        // HÀM TÍNH TOÁN CẢ 5 BƯỚC VÀ VẼ BIỂU ĐỒ
         function calculateNRW() {
             let sumP = 0;
             let minQNight = Infinity;
@@ -671,6 +697,9 @@
             let pDemAtMinQ = 0;
 
             const currentData = patternsStore[activePattern];
+            const qArray = [];
+            const pArray = [];
+            const timeLabels = [];
 
             for (let i = 0; i < 24; i++) {
                 const qElem = document.getElementById(`q_${i}`);
@@ -680,6 +709,9 @@
                 const pVal = pElem ? parseVietnameseNumber(pElem.value) : currentData[i].p;
                 
                 sumP += pVal;
+                qArray.push(qVal);
+                pArray.push(pVal);
+                timeLabels.push(currentData[i].time.split(' ')[0]);
 
                 if (i >= 0 && i <= 3) {
                     if (qVal < minQNight && qVal > 0) {
@@ -708,14 +740,12 @@
                 totalQNRWRawDay += qThoHour;
 
                 const qThoElem = document.getElementById(`q_tho_${i}`);
-                if (qThoElem) {
-                    qThoElem.innerText = formatVietnameseNumber(qThoHour, 2);
-                }
+                if (qThoElem) qThoElem.innerText = formatVietnameseNumber(qThoHour, 2);
             }
 
             const rawPercent = (totalQNRWRawDay / qTongDay) * 100.0;
 
-            // Kết quả Bước 1
+            // BƯỚC 1 Result
             document.getElementById('res_raw_percent').innerText = formatVietnameseNumber(rawPercent, 2) + " %";
             document.getElementById('res_raw_q_day').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
             document.getElementById('res_q_mnf').innerText = formatVietnameseNumber(minQNight, 2) + " m³/h";
@@ -723,7 +753,7 @@
             document.getElementById('res_p_dem').innerText = formatVietnameseNumber(pDemAtMinQ, 1) + " m";
             document.getElementById('res_p_tb').innerText = formatVietnameseNumber(pTB24h, 2) + " m";
 
-            // Kết quả Bước 2
+            // BƯỚC 2 Result
             const lM = parseVietnameseNumber(document.getElementById('l_m').value); 
             const lP = parseVietnameseNumber(document.getElementById('l_p').value); 
             const nC = parseVietnameseNumber(document.getElementById('n_c').value); 
@@ -733,32 +763,23 @@
             const ublLiterHour = (0.02 * lM + 1.25 * nC + 0.033 * lP) * Math.pow(pDemAtMinQ / 50.0, N_EXPONENT);
             const qNHour = ublLiterHour / 1000.0; 
             const qNDay = 24.0 * qNHour * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
-
-            let qNUnit = 0;
-            if (nC > 0) {
-                qNUnit = ublLiterHour / nC;
-            }
-
+            const qNUnit = nC > 0 ? ublLiterHour / nC : 0;
             const qLossTemp = totalQNRWRawDay - qNDay;
 
             document.getElementById('res_q_n_hour').innerText = formatVietnameseNumber(qNHour, 3);
             document.getElementById('res_q_n_day').innerText = formatVietnameseNumber(qNDay, 1) + " m³/ngđ";
             document.getElementById('res_q_n_unit').innerText = formatVietnameseNumber(qNUnit, 2);
             document.getElementById('res_q_loss_temp').innerText = formatVietnameseNumber(qLossTemp, 1) + " m³/ngđ";
-
             document.getElementById('step2_formula_detail').innerText = 
-                `Phép tính: Q Thất thoát tạm tính = ${formatVietnameseNumber(totalQNRWRawDay, 1)} (Q rò rỉ. thô 24h) - ${formatVietnameseNumber(qNDay, 1)} (Q nền 24h, N=${N_EXPONENT}) = ${formatVietnameseNumber(qLossTemp, 1)} m³/ngđ`;
+                `Phép tính: Q Thất thoát tạm tính = ${formatVietnameseNumber(totalQNRWRawDay, 1)} (Q rò rỉ. thô 24h) - ${formatVietnameseNumber(qNDay, 1)} (Q nền 24h) = ${formatVietnameseNumber(qLossTemp, 1)} m³/ngđ`;
 
-            // XỬ LÝ BƯỚC 3: CÂN BẰNG RÒ RỈ VỠ ỐNG THỰC SỰ
+            // BƯỚC 3 Result
             const leakRes = renderLeakPointsTable();
             const qLeakPointsM3h = leakRes.totalM3h;
             const qCustNight = parseVietnameseNumber(document.getElementById('q_customer_night').value);
 
-            // Q vỡ ống đêm = Q_MNF - Q_n - Q_KH_đêm - Q_điểm_rò_rỉ
             let qBurstNight = minQNight - qNHour - qCustNight - qLeakPointsM3h;
-            if (qBurstNight < 0) qBurstNight = 0; // Tránh âm
-
-            // Quy đổi Q vỡ ống cả ngày theo áp lực (N = N_EXPONENT)
+            if (qBurstNight < 0) qBurstNight = 0;
             const qBurstDay = 24.0 * qBurstNight * Math.pow(pTB24h / pDemAtMinQ, N_EXPONENT);
 
             document.getElementById('res_q_burst_night').innerText = formatVietnameseNumber(qBurstNight, 2) + " m³/h";
@@ -769,9 +790,64 @@
             document.getElementById('b3_q_n').innerText = formatVietnameseNumber(qNHour, 3) + " m³/h";
             document.getElementById('b3_q_cust').innerText = formatVietnameseNumber(qCustNight, 2) + " m³/h";
             document.getElementById('b3_q_leak_pts').innerText = formatVietnameseNumber(qLeakPointsM3h, 3) + " m³/h";
+
+            // BƯỚC 4: RENDER BẢNG IWA WATER BALANCE
+            document.getElementById('iwa_siv').innerText = formatVietnameseNumber(qTongDay, 1) + " m³/ngđ";
+            const iwaAuth = qTongDay - totalQNRWRawDay;
+            document.getElementById('iwa_auth_cons').innerText = formatVietnameseNumber(iwaAuth > 0 ? iwaAuth : 0, 1) + " m³/ngđ";
+            document.getElementById('iwa_nrw_total').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
+            document.getElementById('iwa_real_losses').innerText = formatVietnameseNumber(totalQNRWRawDay, 1) + " m³/ngđ";
+            document.getElementById('iwa_ubl').innerText = formatVietnameseNumber(qNDay, 1) + " m³/ngđ";
+            document.getElementById('iwa_bursts').innerText = formatVietnameseNumber(totalQNRWRawDay - qNDay, 1) + " m³/ngđ";
+
+            // BƯỚC 5: VẼ BIỂU ĐỒ CHART.JS
+            renderChart(timeLabels, qArray, pArray);
         }
 
-        // Modal Pattern
+        function renderChart(labels, qData, pData) {
+            const ctx = document.getElementById('patternChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Lưu lượng Q (m³/h)',
+                            data: qData,
+                            borderColor: '#1d4ed8',
+                            backgroundColor: 'rgba(29, 78, 216, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Áp lực P (m)',
+                            data: pData,
+                            borderColor: '#d97706',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 11, weight: 'bold' } } }
+                    },
+                    scales: {
+                        x: { grid: { color: '#e2e8f0' } },
+                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Lưu lượng (m³/h)' } },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Áp lực (m)' } }
+                    }
+                }
+            });
+        }
+
         function openPatternModal() {
             renderPatternSelector();
             document.getElementById('current_editing_pat_label').innerText = `Pattern ${activePattern}`;
@@ -791,9 +867,9 @@
             for (let i = 1; i <= 5; i++) {
                 const isActive = (i === activePattern);
                 const btnHtml = `
-                    <button onclick="selectActivePattern(${i})" class="p-2.5 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'}">
+                    <button onclick="selectActivePattern(${i})" class="p-2 rounded text-xs font-bold border transition flex flex-col items-center justify-center ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'}">
                         <span>Pattern ${i}</span>
-                        ${isActive ? '<span class="text-[0.65rem] bg-yellow-400 text-yellow-950 font-extrabold px-1.5 py-0.2 rounded mt-1">ĐANG CHỌN</span>' : ''}
+                        ${isActive ? '<span class="text-[0.6rem] bg-yellow-400 text-yellow-950 font-extrabold px-1 rounded mt-0.5">ĐANG CHỌN</span>' : ''}
                     </button>
                 `;
                 container.insertAdjacentHTML('beforeend', btnHtml);
